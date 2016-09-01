@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.3">
+<eagle version="6.6.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -9,7 +9,7 @@
 <grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.05" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
-<layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
+<layer number="2" name="Route2" color="14" fill="3" visible="no" active="no"/>
 <layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
 <layer number="4" name="Route4" color="1" fill="4" visible="no" active="no"/>
 <layer number="5" name="Route5" color="4" fill="4" visible="no" active="no"/>
@@ -22,7 +22,7 @@
 <layer number="12" name="Route12" color="1" fill="5" visible="no" active="no"/>
 <layer number="13" name="Route13" color="4" fill="5" visible="no" active="no"/>
 <layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
-<layer number="15" name="Route15" color="4" fill="6" visible="no" active="no"/>
+<layer number="15" name="Route15" color="10" fill="6" visible="no" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
@@ -1574,7 +1574,7 @@ Please make sure your boards conform to these design rules.</description>
 <attribute name="VALUE" x="15.032" y="31.937" size="1.27" layer="27" ratio="10" rot="R180"/>
 <attribute name="NAME" x="10.905" y="25.079" size="0.8128" layer="25" ratio="10" rot="R180"/>
 </element>
-<element name="U5" library="maxim" package="SOT23-5L" value="MAX8687" x="3" y="25" smashed="yes">
+<element name="U5" library="maxim" package="SOT23-5L" value="MAX8867" x="3" y="25" smashed="yes">
 <attribute name="NAME" x="2.995" y="21.805" size="0.8128" layer="25"/>
 <attribute name="VALUE" x="1.095" y="21.825" size="1.27" layer="27"/>
 </element>
