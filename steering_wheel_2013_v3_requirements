@@ -1,0 +1,14 @@
+TODO
+
+FreeRTOS v9 + HAL
+Segger RTT
+USB CDC VCP
+
+CAN Driver
+LED Portexpander Driver (I2C)
+Button Debouncer (ExtInt)
+Display edipTFT32 (UART + DMA?)
+
+
+
+
