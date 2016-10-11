@@ -348,6 +348,64 @@ Source: www.ti.com/.. slvs087l.pdf</description>
 <smd name="9" x="0.975" y="-1.9" dx="0.95" dy="0.3" layer="1" roundness="100" rot="R90"/>
 <rectangle x1="-2" y1="1.25" x2="-1.25" y2="2" layer="39"/>
 </package>
+<package name="PW_R-PDSO-G14">
+<wire x1="-2.55" y1="2.15" x2="2.55" y2="2.15" width="0.2032" layer="21"/>
+<wire x1="2.55" y1="2.15" x2="2.55" y2="-2.15" width="0.2032" layer="21"/>
+<wire x1="2.55" y1="-2.15" x2="-2.55" y2="-2.15" width="0.2032" layer="21"/>
+<wire x1="-2.55" y1="-2.15" x2="-2.55" y2="2.15" width="0.2032" layer="21"/>
+<circle x="-1.875" y="-1.3" radius="0.325" width="0.2032" layer="21"/>
+<smd name="1" x="-1.95" y="-2.9" dx="0.4" dy="1.2" layer="1"/>
+<smd name="2" x="-1.3" y="-2.9" dx="0.4" dy="1.2" layer="1"/>
+<smd name="3" x="-0.65" y="-2.9" dx="0.4" dy="1.2" layer="1"/>
+<smd name="4" x="0" y="-2.9" dx="0.4" dy="1.2" layer="1"/>
+<smd name="5" x="0.65" y="-2.9" dx="0.4" dy="1.2" layer="1"/>
+<smd name="6" x="1.3" y="-2.9" dx="0.4" dy="1.2" layer="1"/>
+<smd name="7" x="1.95" y="-2.9" dx="0.4" dy="1.2" layer="1"/>
+<smd name="8" x="1.95" y="2.9" dx="0.4" dy="1.2" layer="1" rot="R180"/>
+<smd name="9" x="1.3" y="2.9" dx="0.4" dy="1.2" layer="1" rot="R180"/>
+<smd name="10" x="0.65" y="2.9" dx="0.4" dy="1.2" layer="1" rot="R180"/>
+<smd name="11" x="0" y="2.9" dx="0.4" dy="1.2" layer="1" rot="R180"/>
+<smd name="12" x="-0.65" y="2.9" dx="0.4" dy="1.2" layer="1" rot="R180"/>
+<smd name="13" x="-1.3" y="2.9" dx="0.4" dy="1.2" layer="1" rot="R180"/>
+<smd name="14" x="-1.95" y="2.9" dx="0.4" dy="1.2" layer="1" rot="R180"/>
+<text x="-3.16" y="-2.54" size="0.8128" layer="25" rot="R90">&gt;NAME</text>
+<text x="3.825" y="-2.54" size="0.8128" layer="27" rot="R90">&gt;VALUE</text>
+<rectangle x1="-2.1" y1="-3.3" x2="-1.8" y2="-2.23" layer="51"/>
+<rectangle x1="-1.45" y1="-3.3" x2="-1.15" y2="-2.23" layer="51"/>
+<rectangle x1="-0.8" y1="-3.3" x2="-0.5" y2="-2.23" layer="51"/>
+<rectangle x1="-0.15" y1="-3.3" x2="0.15" y2="-2.23" layer="51"/>
+<rectangle x1="0.5" y1="-3.3" x2="0.8" y2="-2.23" layer="51"/>
+<rectangle x1="1.15" y1="-3.3" x2="1.45" y2="-2.23" layer="51"/>
+<rectangle x1="1.8" y1="-3.3" x2="2.1" y2="-2.23" layer="51"/>
+<rectangle x1="1.8" y1="2.23" x2="2.1" y2="3.3" layer="51" rot="R180"/>
+<rectangle x1="1.15" y1="2.23" x2="1.45" y2="3.3" layer="51" rot="R180"/>
+<rectangle x1="0.5" y1="2.23" x2="0.8" y2="3.3" layer="51" rot="R180"/>
+<rectangle x1="-0.15" y1="2.23" x2="0.15" y2="3.3" layer="51" rot="R180"/>
+<rectangle x1="-0.8" y1="2.23" x2="-0.5" y2="3.3" layer="51" rot="R180"/>
+<rectangle x1="-1.45" y1="2.23" x2="-1.15" y2="3.3" layer="51" rot="R180"/>
+<rectangle x1="-2.1" y1="2.23" x2="-1.8" y2="3.3" layer="51" rot="R180"/>
+</package>
+<package name="11PFM">
+<smd name="PAD" x="0" y="0" dx="13.37" dy="9.126" layer="1" rot="R90"/>
+<smd name="6" x="0" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<smd name="7" x="1.27" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<smd name="8" x="2.54" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<smd name="9" x="3.81" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<smd name="10" x="5.08" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<smd name="11" x="6.35" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<smd name="5" x="-1.27" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<smd name="4" x="-2.54" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<smd name="3" x="-3.81" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<smd name="2" x="-5.08" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<smd name="1" x="-6.35" y="-9.5" dx="0.86" dy="2.41" layer="1" rot="R180"/>
+<wire x1="7.5" y1="7.5" x2="-7.5" y2="7.5" width="0.127" layer="21"/>
+<wire x1="-7.5" y1="7.5" x2="-7.5" y2="-7.5" width="0.127" layer="21"/>
+<wire x1="-7.5" y1="-7.5" x2="7.5" y2="-7.5" width="0.127" layer="21"/>
+<wire x1="7.5" y1="-7.5" x2="7.5" y2="7.5" width="0.127" layer="21"/>
+<text x="-7" y="8" size="1.27" layer="25">&gt;Name</text>
+<text x="1" y="8" size="1.27" layer="27">&gt;Value</text>
+<circle x="-6" y="-6" radius="1" width="0.127" layer="27"/>
+</package>
 </packages>
 <symbols>
 <symbol name="CC3100">
@@ -426,20 +484,20 @@ Source: www.ti.com/.. slvs087l.pdf</description>
 <text x="-10.16" y="-22.86" size="1.778" layer="94">&gt;VALUE</text>
 </symbol>
 <symbol name="LMZ217XX">
-<pin name="VIN" x="-15.24" y="7.62" length="middle"/>
-<pin name="EN" x="-15.24" y="2.54" length="middle"/>
-<pin name="SS" x="-15.24" y="-2.54" length="middle"/>
-<pin name="GND" x="-15.24" y="-7.62" length="middle"/>
-<pin name="VOUT" x="15.24" y="7.62" length="middle" rot="R180"/>
-<pin name="PG" x="15.24" y="2.54" length="middle" rot="R180"/>
-<pin name="VOS" x="15.24" y="-2.54" length="middle" rot="R180"/>
-<pin name="FB" x="15.24" y="-7.62" length="middle" rot="R180"/>
+<pin name="VIN" x="-12.7" y="7.62" length="short" direction="pwr"/>
+<pin name="EN" x="-12.7" y="2.54" length="short" direction="in"/>
+<pin name="SS" x="-12.7" y="-2.54" length="short" direction="pas"/>
+<pin name="GND" x="-12.7" y="-7.62" length="short" direction="pwr"/>
+<pin name="VOUT" x="12.7" y="7.62" length="short" direction="pas" rot="R180"/>
+<pin name="PG" x="12.7" y="2.54" length="short" direction="out" rot="R180"/>
+<pin name="VOS" x="12.7" y="-2.54" length="short" direction="in" rot="R180"/>
+<pin name="FB" x="12.7" y="-7.62" length="short" direction="in" rot="R180"/>
 <wire x1="-10.16" y1="12.7" x2="-10.16" y2="-12.7" width="0.254" layer="94"/>
 <wire x1="-10.16" y1="-12.7" x2="10.16" y2="-12.7" width="0.254" layer="94"/>
 <wire x1="10.16" y1="-12.7" x2="10.16" y2="12.7" width="0.254" layer="94"/>
 <wire x1="10.16" y1="12.7" x2="-10.16" y2="12.7" width="0.254" layer="94"/>
-<text x="-10.16" y="13.716" size="1.27" layer="94">&gt;NAME</text>
-<text x="-10.16" y="-15.24" size="1.27" layer="94">&gt;VALUE</text>
+<text x="-10.16" y="13.716" size="1.27" layer="95">&gt;NAME</text>
+<text x="-10.16" y="-15.24" size="1.27" layer="96">&gt;VALUE</text>
 </symbol>
 <symbol name="TXB0108">
 <pin name="A4" x="-15.24" y="2.54" length="middle"/>
@@ -496,6 +554,43 @@ Source: www.ti.com/.. slvs087l.pdf</description>
 <wire x1="-15.24" y1="17.78" x2="-15.24" y2="-20.32" width="0.254" layer="94"/>
 <wire x1="-15.24" y1="-20.32" x2="12.7" y2="-20.32" width="0.254" layer="94"/>
 <pin name="GND" x="-2.54" y="-25.4" length="middle" rot="R90"/>
+</symbol>
+<symbol name="SN74LV4T125">
+<pin name="VCC" x="0" y="20.32" length="short" direction="pwr" rot="R270"/>
+<pin name="1A" x="-12.7" y="7.62" length="short" direction="in"/>
+<pin name="!1OE" x="-12.7" y="5.08" length="short" direction="in"/>
+<pin name="2A" x="-12.7" y="0" length="short" direction="in"/>
+<pin name="!2OE" x="-12.7" y="-2.54" length="short" direction="in"/>
+<pin name="3A" x="-12.7" y="-7.62" length="short" direction="in"/>
+<pin name="!3OE" x="-12.7" y="-10.16" length="short" direction="in"/>
+<pin name="4A" x="-12.7" y="-15.24" length="short" direction="in"/>
+<pin name="!4OE" x="-12.7" y="-17.78" length="short" direction="in"/>
+<pin name="1Y" x="12.7" y="7.62" length="short" direction="out" rot="R180"/>
+<pin name="2Y" x="12.7" y="0" length="short" direction="out" rot="R180"/>
+<pin name="3Y" x="12.7" y="-7.62" length="short" direction="out" rot="R180"/>
+<pin name="4Y" x="12.7" y="-15.24" length="short" direction="out" rot="R180"/>
+<pin name="GND" x="0" y="-27.94" length="short" direction="pwr" rot="R90"/>
+<wire x1="-10.16" y1="17.78" x2="10.16" y2="17.78" width="0.254" layer="94"/>
+<wire x1="10.16" y1="17.78" x2="10.16" y2="-25.4" width="0.254" layer="94"/>
+<wire x1="10.16" y1="-25.4" x2="-10.16" y2="-25.4" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-25.4" x2="-10.16" y2="17.78" width="0.254" layer="94"/>
+<text x="-10.16" y="20.32" size="1.778" layer="95">&gt;Name</text>
+<text x="-10.16" y="-27.94" size="1.778" layer="96">&gt;Value</text>
+</symbol>
+<symbol name="LMZ120XX">
+<pin name="VIN" x="-12.7" y="7.62" length="short" direction="pwr"/>
+<pin name="EN" x="-12.7" y="2.54" length="short" direction="in"/>
+<pin name="SS" x="-12.7" y="-2.54" length="short" direction="pas"/>
+<pin name="AGND" x="-12.7" y="-7.62" length="short" direction="pwr"/>
+<pin name="VOUT" x="12.7" y="7.62" length="short" direction="pas" rot="R180"/>
+<pin name="FB" x="12.7" y="-2.54" length="short" direction="in" rot="R180"/>
+<wire x1="-10.16" y1="12.7" x2="-10.16" y2="-12.7" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-12.7" x2="10.16" y2="-12.7" width="0.254" layer="94"/>
+<wire x1="10.16" y1="-12.7" x2="10.16" y2="12.7" width="0.254" layer="94"/>
+<wire x1="10.16" y1="12.7" x2="-10.16" y2="12.7" width="0.254" layer="94"/>
+<text x="-10.16" y="13.716" size="1.27" layer="95">&gt;NAME</text>
+<text x="-10.16" y="-15.24" size="1.27" layer="96">&gt;VALUE</text>
+<pin name="PGND" x="12.7" y="-7.62" length="short" direction="pwr" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -698,6 +793,56 @@ Source: www.ti.com/.. slvs087l.pdf</description>
 </connects>
 <technologies>
 <technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="SN74LV4T125" prefix="U">
+<gates>
+<gate name="G$1" symbol="SN74LV4T125" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="PW_R-PDSO-G14">
+<connects>
+<connect gate="G$1" pin="!1OE" pad="1"/>
+<connect gate="G$1" pin="!2OE" pad="4"/>
+<connect gate="G$1" pin="!3OE" pad="10"/>
+<connect gate="G$1" pin="!4OE" pad="13"/>
+<connect gate="G$1" pin="1A" pad="2"/>
+<connect gate="G$1" pin="1Y" pad="3"/>
+<connect gate="G$1" pin="2A" pad="5"/>
+<connect gate="G$1" pin="2Y" pad="6"/>
+<connect gate="G$1" pin="3A" pad="9"/>
+<connect gate="G$1" pin="3Y" pad="8"/>
+<connect gate="G$1" pin="4A" pad="12"/>
+<connect gate="G$1" pin="4Y" pad="11"/>
+<connect gate="G$1" pin="GND" pad="7"/>
+<connect gate="G$1" pin="VCC" pad="14"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="LMZ120*" prefix="U" uservalue="yes">
+<description>&lt;b&gt;LMZ12010 10-A SIMPLE SWITCHER® Power Module With 20-V Maximum Input Voltage&lt;/b&gt;</description>
+<gates>
+<gate name="G$1" symbol="LMZ120XX" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="11PFM">
+<connects>
+<connect gate="G$1" pin="AGND" pad="3 5 6"/>
+<connect gate="G$1" pin="EN" pad="4"/>
+<connect gate="G$1" pin="FB" pad="7"/>
+<connect gate="G$1" pin="PGND" pad="PAD"/>
+<connect gate="G$1" pin="SS" pad="8"/>
+<connect gate="G$1" pin="VIN" pad="1 2"/>
+<connect gate="G$1" pin="VOUT" pad="10 11"/>
+</connects>
+<technologies>
+<technology name="10"/>
 </technologies>
 </device>
 </devices>
