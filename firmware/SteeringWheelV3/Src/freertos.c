@@ -44,18 +44,26 @@
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
 #include "task.h"
+#include "cmsis_os.h"
 
 /* USER CODE BEGIN Includes */     
+
+#include "stm32f4xx_hal.h"
+#include "can.h"
 
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
+osThreadId defaultTaskHandle;
 
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
+void StartDefaultTask(void const * argument);
+
+void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* USER CODE BEGIN FunctionPrototypes */
 
@@ -77,6 +85,87 @@ unsigned long getRunTimeCounterValue(void)
 return 0;
 }
 /* USER CODE END 1 */
+
+/* Init FreeRTOS */
+
+void MX_FREERTOS_Init(void) {
+  /* USER CODE BEGIN Init */
+       
+  /* USER CODE END Init */
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* Create the thread(s) */
+  /* definition and creation of defaultTask */
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+}
+
+/* StartDefaultTask function */
+void StartDefaultTask(void const * argument)
+{
+
+  /* USER CODE BEGIN StartDefaultTask */
+  /* Infinite loop */
+  // enable 5V
+  HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
+
+  if(CAN_Config(&hcan1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  hcan1.pTxMsg->StdId = 0x200;
+  hcan1.pTxMsg->RTR = CAN_RTR_DATA;
+  hcan1.pTxMsg->IDE = CAN_ID_STD;
+  hcan1.pTxMsg->DLC = 2;
+  hcan1.pTxMsg->Data[0] = 0xCA;
+  hcan1.pTxMsg->Data[1] = 0xFE;
+
+  /* Infinite loop */
+  for(;;)
+  {
+    HAL_CAN_Transmit_IT(&hcan1);
+
+//    if(HAL_CAN_GetState(&hcan1) != HAL_CAN_STATE_READY)
+//    {
+//      HAL_GPIO_TogglePin(GPIOB, LED_3_Pin);
+//    }
+//
+//
+//    if(HAL_CAN_Receive(&hcan1, CAN_FIFO0, 10) != HAL_OK)
+//    {
+//      HAL_GPIO_TogglePin(GPIOB, LED_3_Pin);
+//    }
+//
+//    if(hcan1.pRxMsg->StdId == 0x200)
+//    {
+//      HAL_GPIO_TogglePin(GPIOB, LED_0_Pin);
+//    }
+
+    osDelay(1000);
+
+  }
+  /* USER CODE END StartDefaultTask */
+}
 
 /* USER CODE BEGIN Application */
      

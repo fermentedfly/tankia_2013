@@ -53,6 +53,8 @@
 
 #define EN_5V_Pin GPIO_PIN_0
 #define EN_5V_GPIO_Port GPIOC
+#define ADC1_Clutch_Pin GPIO_PIN_4
+#define ADC1_Clutch_GPIO_Port GPIOA
 #define MAX_SHIFT_DOWN_Pin GPIO_PIN_4
 #define MAX_SHIFT_DOWN_GPIO_Port GPIOC
 #define MAX_MINUS_Pin GPIO_PIN_5
