@@ -60,13 +60,90 @@ extern CAN_HandleTypeDef hcan1;
 
 /* USER CODE BEGIN Private defines */
 
-#define CAN_MO_BCM_STATUS_ID 0x210
+#define CAN1_BANK_NUMBER 28
+#define CAN_RX_TASK_STACK_SIZE 512
+
+// CAN Message IDS
+
+// Received
+#define CAN_MO_BCM_FILTER_NR 0
+
 #define CAN_MO_BCM_SETUP_CONFIRM_1_ID 0x200
+#define CAN_MO_BCM_SETUP_CONFIRM_2_ID 0x201
+#define CAN_MO_BCM_SETUP_CONFIRM_3_ID 0x202
+#define CAN_MO_BCM_SETUP_CONFIRM_4_ID 0x203
+
+#define CAN_MO_BCM_STATUS_ID 0x210
+
+#define CAN_MO_LVPD_FILTER_NR 1
 
 #define CAN_MO_LVPD_SETUP_CONFIRM_1_ID 0x300
+#define CAN_MO_LVPD_SETUP_CONFIRM_2_ID 0x301
+#define CAN_MO_LVPD_SETUP_CONFIRM_3_ID 0x302
+#define CAN_MO_LVPD_SETUP_CONFIRM_4_ID 0x303
+
 #define CAN_MO_LVPD_STATUS_ID 0x310
 
+#define CAN_MO_MS4_FILTER_NR 2
+
 #define CAN_MO_MS4_IRA_ID 0x773
+
+// CAN Message Containers
+typedef struct __attribute__((__packed__)) CAN_MO_BCM_SETUP_1
+{
+  uint8_t data_select;
+  uint8_t clutch_points;
+  uint8_t clutch_tolerance;
+  uint16_t c_sens_min;
+  uint16_t c_sens_max;
+
+} CAN_MO_BCM_SETUP_1_t;
+
+/**
+ * @struct CAN_MO_BCM_SETUP_2
+ * @brief CAN Message bcm setup 2 message container
+ */
+typedef struct __attribute__((__packed__))  CAN_MO_BCM_SETUP_2
+{
+  uint8_t data_select;
+  uint8_t g_acc_max_wspin;
+  uint8_t g_acc_min_speed;
+  uint8_t g_acc_shift_rpm_1; // RPM/100
+  uint8_t g_acc_shift_rpm_2; // RPM/100
+  uint8_t g_acc_shift_rpm_3; // RPM/100
+
+} CAN_MO_BCM_SETUP_2_t;
+
+/**
+ * @struct CAN_MO_BCM_SETUP_3
+ * @brief CAN Message bcm setup 3 message container
+ */
+typedef struct __attribute__((__packed__)) CAN_MO_BCM_SETUP_3
+{
+  uint8_t data_select;
+  uint8_t g_min_shift_delay; // *10[ms]
+  uint8_t g_up_holdtime; // *10[ms]
+  uint8_t g_dn_holdtime; // *10[ms]
+  uint8_t g_n_holdtime; // *1[ms]
+  uint8_t traction; // traction control level: 0 - 11
+  uint8_t map; // mapping: 1 - 2
+
+} CAN_MO_BCM_SETUP_3_t;
+
+/**
+ * @struct CAN_MO_BCM_SETUP_4
+ * @brief CAN Message bcm setup 4 message container
+ */
+typedef struct __attribute__((__packed__)) CAN_MO_BCM_SETUP_4
+{
+  uint8_t data_select;
+  uint8_t acc_clutch_k1;
+  uint8_t acc_clutch_k2;
+  uint8_t acc_clutch_k3;
+  uint8_t acc_clutch_p1;
+  uint8_t acc_clutch_p2;
+
+} CAN_MO_BCM_SETUP_4_t;
 
 /* USER CODE END Private defines */
 
@@ -76,7 +153,7 @@ void MX_CAN1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
-HAL_StatusTypeDef CAN_Config(CAN_HandleTypeDef* hcan);
+HAL_StatusTypeDef CAN_Init(CAN_HandleTypeDef* hcan);
 
 /* USER CODE END Prototypes */
 

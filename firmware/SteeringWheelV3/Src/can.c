@@ -44,16 +44,19 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "can.h"
-
 #include "gpio.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "cmsis_os.h"
+#include "display.h"
+#include "event_groups.h"
 
 /* USER CODE BEGIN 0 */
 
-
-
 static CAN_FilterConfTypeDef CAN_filter_BCM = {
-    .FilterNumber = 0,
-    .BankNumber = 14,
+    .FilterNumber = CAN_MO_BCM_FILTER_NR,
+    .BankNumber = CAN1_BANK_NUMBER,
     .FilterActivation = ENABLE,
     .FilterMode = CAN_FILTERMODE_IDMASK,
     .FilterScale = CAN_FILTERSCALE_16BIT,
@@ -67,8 +70,8 @@ static CAN_FilterConfTypeDef CAN_filter_BCM = {
 };
 
 static CAN_FilterConfTypeDef CAN_filter_LVPD = {
-    .FilterNumber = 1,
-    .BankNumber = 28,
+    .FilterNumber = CAN_MO_LVPD_FILTER_NR,
+    .BankNumber = CAN1_BANK_NUMBER,
     .FilterActivation = ENABLE,
     .FilterMode = CAN_FILTERMODE_IDMASK,
     .FilterScale = CAN_FILTERSCALE_16BIT,
@@ -82,8 +85,8 @@ static CAN_FilterConfTypeDef CAN_filter_LVPD = {
 };
 
 static CAN_FilterConfTypeDef CAN_filter_MS4 = {
-    .FilterNumber = 2,
-    .BankNumber = 14,
+    .FilterNumber = CAN_MO_MS4_FILTER_NR,
+    .BankNumber = CAN1_BANK_NUMBER,
     .FilterActivation = ENABLE,
     .FilterMode = CAN_FILTERMODE_IDMASK,
     .FilterScale = CAN_FILTERSCALE_16BIT,
@@ -198,23 +201,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 
 /* USER CODE BEGIN 1 */
 
-void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
-{
-  if((hcan->pRxMsg->StdId == 0x200) && (hcan->pRxMsg->IDE == CAN_ID_STD))
-  {
-    HAL_GPIO_TogglePin(GPIOB, LED_0_Pin);
-  }
-  else
-  {
-    HAL_GPIO_TogglePin(GPIOB, LED_1_Pin);
-  }
-
-  // restart receive
-  HAL_CAN_Receive_IT(hcan, hcan->pRxMsg->FIFONumber);
-
-}
-
-HAL_StatusTypeDef CAN_Config(CAN_HandleTypeDef* hcan)
+HAL_StatusTypeDef CAN_Init(CAN_HandleTypeDef* hcan)
 {
   hcan->pTxMsg = &TxMessage;
   hcan->pRxMsg = &RxMessage;
@@ -232,6 +219,29 @@ HAL_StatusTypeDef CAN_Config(CAN_HandleTypeDef* hcan)
   HAL_CAN_Receive_IT(hcan, CAN_FIFO1);
 
   return HAL_OK;
+}
+
+void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
+{
+  assert_param(hcan->pRxMsg->IDE == CAN_ID_STD);
+
+  switch(hcan->pRxMsg->StdId)
+  {
+    case CAN_MO_BCM_SETUP_CONFIRM_1_ID:
+    {
+      CAN_MO_BCM_SETUP_1_t *msg = (CAN_MO_BCM_SETUP_1_t *)hcan->pRxMsg->Data;
+      DISPLAY_DATA_ClutchNormal.clutch_points = msg->clutch_points;
+      DISPLAY_DATA_ClutchNormal.clutch_tolerance = msg->clutch_tolerance;
+      DISPLAY_DATA_ClutchNormal.c_sens_min = msg->c_sens_min;
+      DISPLAY_DATA_ClutchNormal.c_sens_max = msg->c_sens_max;
+    }
+  }
+
+
+
+  // restart receive
+  HAL_CAN_Receive_IT(hcan, hcan->pRxMsg->FIFONumber);
+
 }
 
 /* USER CODE END 1 */
