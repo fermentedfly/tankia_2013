@@ -1,64 +1,10 @@
-/**
-  ******************************************************************************
-  * File Name          : CAN.h
-  * Description        : This file provides code for the configuration
-  *                      of the CAN instances.
-  ******************************************************************************
-  *
-  * Copyright (c) 2016 STMicroelectronics International N.V. 
-  * All rights reserved.
-  *
-  * Redistribution and use in source and binary forms, with or without 
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice, 
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other 
-  *    contributors to this software may be used to endorse or promote products 
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this 
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under 
-  *    this license is void and will automatically terminate your rights under 
-  *    this license. 
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT 
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
-  */
-/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __can_H
 #define __can_H
-#ifdef __cplusplus
- extern "C" {
-#endif
 
-/* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 #include "main.h"
 
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
 extern CAN_HandleTypeDef hcan1;
-
-/* USER CODE BEGIN Private defines */
 
 #define CAN1_BANK_NUMBER 28
 #define CAN_RX_TASK_STACK_SIZE 512
@@ -79,14 +25,16 @@ extern CAN_HandleTypeDef hcan1;
 
 #define CAN_MO_LVPD_SETUP_CONFIRM_1_ID 0x300
 #define CAN_MO_LVPD_SETUP_CONFIRM_2_ID 0x301
-#define CAN_MO_LVPD_SETUP_CONFIRM_3_ID 0x302
-#define CAN_MO_LVPD_SETUP_CONFIRM_4_ID 0x303
 
 #define CAN_MO_LVPD_STATUS_ID 0x310
 
 #define CAN_MO_MS4_FILTER_NR 2
 
 #define CAN_MO_MS4_IRA_ID 0x773
+#define CAN_MO_MS4_SPEED_ID 0x775
+#define CAN_MO_MS4_GDA_ID 0x777
+#define CAN_MO_MS4_TC_ID 0x778
+#define CAN_MO_MS4_SBDB_ID 0x77A
 
 // CAN Message Containers
 typedef struct __attribute__((__packed__)) CAN_MO_BCM_SETUP_1
@@ -99,10 +47,6 @@ typedef struct __attribute__((__packed__)) CAN_MO_BCM_SETUP_1
 
 } CAN_MO_BCM_SETUP_1_t;
 
-/**
- * @struct CAN_MO_BCM_SETUP_2
- * @brief CAN Message bcm setup 2 message container
- */
 typedef struct __attribute__((__packed__))  CAN_MO_BCM_SETUP_2
 {
   uint8_t data_select;
@@ -114,10 +58,6 @@ typedef struct __attribute__((__packed__))  CAN_MO_BCM_SETUP_2
 
 } CAN_MO_BCM_SETUP_2_t;
 
-/**
- * @struct CAN_MO_BCM_SETUP_3
- * @brief CAN Message bcm setup 3 message container
- */
 typedef struct __attribute__((__packed__)) CAN_MO_BCM_SETUP_3
 {
   uint8_t data_select;
@@ -130,10 +70,6 @@ typedef struct __attribute__((__packed__)) CAN_MO_BCM_SETUP_3
 
 } CAN_MO_BCM_SETUP_3_t;
 
-/**
- * @struct CAN_MO_BCM_SETUP_4
- * @brief CAN Message bcm setup 4 message container
- */
 typedef struct __attribute__((__packed__)) CAN_MO_BCM_SETUP_4
 {
   uint8_t data_select;
@@ -145,29 +81,88 @@ typedef struct __attribute__((__packed__)) CAN_MO_BCM_SETUP_4
 
 } CAN_MO_BCM_SETUP_4_t;
 
-/* USER CODE END Private defines */
+typedef struct __attribute__((__packed__)) CAN_MO_LVPD_SETUP_1
+{
+  uint8_t data_select;
+  uint8_t fan_off_temp;
+  uint8_t fan_on_temp;
+  uint8_t fan_off_rpm;
+  uint8_t fan_on_rpm;
 
-extern void Error_Handler(void);
+} CAN_MO_LVPD_SETUP_1_t;
+
+typedef struct __attribute__((__packed__)) CAN_MO_LVPD_SETUP_2
+{
+  uint8_t data_select;
+  uint16_t enable_bitfield;
+  uint8_t threshold_multiplex;
+  uint8_t threshold_value;
+
+} CAN_MO_LVPD_SETUP_2_t;
+
+typedef struct __attribute__((__packed__)) CAN_MO_MS4_IRA
+{
+  int8_t igbase;
+  int8_t igmap;
+  uint8_t tdwell;
+  uint8_t rev_msb;
+  uint8_t rev_lsb;
+  uint8_t ath;
+  int8_t dath;
+
+} CAN_MO_MS4_IRA_t;
+
+typedef struct __attribute__((__packed__)) CAN_MO_MS4_SPEED
+{
+  uint8_t speed_msb;
+  uint8_t speed_lsb;
+  uint8_t speedFL;
+  uint8_t speedFR;
+  uint8_t speedRL;
+  uint8_t speedRR;
+
+} CAN_MO_MS4_SPEED_t;
+
+typedef struct __attribute__((__packed__)) CAN_MO_MS4_GDA
+{
+  uint8_t gear;
+  uint8_t gcstate;
+  uint8_t gearratio;
+  uint8_t gearcut_u;
+  uint8_t ddugear;
+  int8_t accx;
+  int8_t accy;
+  int8_t accz;
+
+} CAN_MO_MS4_GDA_t;
+
+typedef struct __attribute__((__packed__)) CAN_MO_MS4_ETC
+{
+  uint8_t etb;
+  uint8_t etb_sp;
+  uint8_t aps;
+  uint16_t p1;
+  uint8_t batt_u;
+  uint8_t camshaftpos;
+  uint8_t lap_c;
+
+} CAN_MO_MS4_ETC_t;
+
+typedef struct __attribute__((__packed__)) CAN_MO_MS4_SBDB
+{
+  uint8_t row_counter;
+  uint8_t state_byte_1;
+  uint8_t state_byte_2;
+  uint8_t state_byte_3;
+  uint8_t db_muxed_1;
+  uint8_t db_muxed_2;
+  uint8_t db_muxed_3;
+  uint8_t db_muxed_4;
+
+} CAN_MO_MS4_SBDB_t;
 
 void MX_CAN1_Init(void);
 
-/* USER CODE BEGIN Prototypes */
-
 HAL_StatusTypeDef CAN_Init(CAN_HandleTypeDef* hcan);
 
-/* USER CODE END Prototypes */
-
-#ifdef __cplusplus
-}
-#endif
 #endif /*__ can_H */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

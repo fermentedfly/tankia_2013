@@ -1,48 +1,3 @@
-/**
-  ******************************************************************************
-  * File Name          : CAN.c
-  * Description        : This file provides code for the configuration
-  *                      of the CAN instances.
-  ******************************************************************************
-  *
-  * Copyright (c) 2016 STMicroelectronics International N.V. 
-  * All rights reserved.
-  *
-  * Redistribution and use in source and binary forms, with or without 
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice, 
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other 
-  *    contributors to this software may be used to endorse or promote products 
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this 
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under 
-  *    this license is void and will automatically terminate your rights under 
-  *    this license. 
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT 
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
-  */
-
-/* Includes ------------------------------------------------------------------*/
 #include "can.h"
 #include "gpio.h"
 #include "FreeRTOS.h"
@@ -51,8 +6,6 @@
 #include "cmsis_os.h"
 #include "display.h"
 #include "event_groups.h"
-
-/* USER CODE BEGIN 0 */
 
 static CAN_FilterConfTypeDef CAN_filter_BCM = {
     .FilterNumber = CAN_MO_BCM_FILTER_NR,
@@ -102,11 +55,12 @@ static CAN_FilterConfTypeDef CAN_filter_MS4 = {
 static CanTxMsgTypeDef        TxMessage;
 static CanRxMsgTypeDef        RxMessage;
 
-/* USER CODE END 0 */
-
 CAN_HandleTypeDef hcan1;
 
-/* CAN1 init function */
+static inline void CAN_RxBCM(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
+static inline void CAN_RxLVPD(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
+static inline void CAN_RxMS4(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
+
 void MX_CAN1_Init(void)
 {
 
@@ -122,10 +76,7 @@ void MX_CAN1_Init(void)
   hcan1.Init.NART = DISABLE;
   hcan1.Init.RFLM = DISABLE;
   hcan1.Init.TXFP = DISABLE;
-  if (HAL_CAN_Init(&hcan1) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  configASSERT(HAL_CAN_Init(&hcan1) == HAL_OK);
 
 }
 
@@ -135,16 +86,8 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
   GPIO_InitTypeDef GPIO_InitStruct;
   if(canHandle->Instance==CAN1)
   {
-  /* USER CODE BEGIN CAN1_MspInit 0 */
-
-  /* USER CODE END CAN1_MspInit 0 */
-    /* Peripheral clock enable */
     __HAL_RCC_CAN1_CLK_ENABLE();
   
-    /**CAN1 GPIO Configuration    
-    PB8     ------> CAN1_RX
-    PB9     ------> CAN1_TX 
-    */
     GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -152,7 +95,6 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     GPIO_InitStruct.Alternate = GPIO_AF9_CAN1;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    /* Peripheral interrupt init */
     HAL_NVIC_SetPriority(CAN1_TX_IRQn, 8, 0);
     HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
     HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 8, 0);
@@ -161,9 +103,6 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     HAL_NVIC_EnableIRQ(CAN1_RX1_IRQn);
     HAL_NVIC_SetPriority(CAN1_SCE_IRQn, 9, 0);
     HAL_NVIC_EnableIRQ(CAN1_SCE_IRQn);
-  /* USER CODE BEGIN CAN1_MspInit 1 */
-
-  /* USER CODE END CAN1_MspInit 1 */
   }
 }
 
@@ -172,19 +111,10 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 
   if(canHandle->Instance==CAN1)
   {
-  /* USER CODE BEGIN CAN1_MspDeInit 0 */
-
-  /* USER CODE END CAN1_MspDeInit 0 */
-    /* Peripheral clock disable */
     __HAL_RCC_CAN1_CLK_DISABLE();
   
-    /**CAN1 GPIO Configuration    
-    PB8     ------> CAN1_RX
-    PB9     ------> CAN1_TX 
-    */
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_8|GPIO_PIN_9);
 
-    /* Peripheral interrupt Deinit*/
     HAL_NVIC_DisableIRQ(CAN1_TX_IRQn);
 
     HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
@@ -194,12 +124,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
     HAL_NVIC_DisableIRQ(CAN1_SCE_IRQn);
 
   }
-  /* USER CODE BEGIN CAN1_MspDeInit 1 */
-
-  /* USER CODE END CAN1_MspDeInit 1 */
 } 
-
-/* USER CODE BEGIN 1 */
 
 HAL_StatusTypeDef CAN_Init(CAN_HandleTypeDef* hcan)
 {
@@ -223,35 +148,146 @@ HAL_StatusTypeDef CAN_Init(CAN_HandleTypeDef* hcan)
 
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 {
-  assert_param(hcan->pRxMsg->IDE == CAN_ID_STD);
+  configASSERT(hcan->pRxMsg->IDE == CAN_ID_STD);
 
-  switch(hcan->pRxMsg->StdId)
+  portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
+  if(hcan->pRxMsg->FMI == CAN_MO_BCM_FILTER_NR)
+  {
+    CAN_RxBCM(hcan->pRxMsg, &xHigherPriorityTaskWoken);
+  }
+
+  if(hcan->pRxMsg->FMI == CAN_MO_LVPD_FILTER_NR)
+  {
+    CAN_RxLVPD(hcan->pRxMsg, &xHigherPriorityTaskWoken);
+  }
+
+  if(hcan->pRxMsg->FMI == CAN_MO_MS4_FILTER_NR)
+  {
+    CAN_RxMS4(hcan->pRxMsg, &xHigherPriorityTaskWoken);
+  }
+
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+  // restart receive
+  HAL_CAN_Receive_IT(hcan, hcan->pRxMsg->FIFONumber);
+}
+
+static inline void CAN_RxBCM(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)
+{
+  switch(pRxMsg->StdId)
   {
     case CAN_MO_BCM_SETUP_CONFIRM_1_ID:
     {
-      CAN_MO_BCM_SETUP_1_t *msg = (CAN_MO_BCM_SETUP_1_t *)hcan->pRxMsg->Data;
+      CAN_MO_BCM_SETUP_1_t *msg = (CAN_MO_BCM_SETUP_1_t *)pRxMsg->Data;
       DISPLAY_DATA_ClutchNormal.clutch_points = msg->clutch_points;
       DISPLAY_DATA_ClutchNormal.clutch_tolerance = msg->clutch_tolerance;
       DISPLAY_DATA_ClutchNormal.c_sens_min = msg->c_sens_min;
       DISPLAY_DATA_ClutchNormal.c_sens_max = msg->c_sens_max;
+
+      xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_CLUTCH_NORMAL, portyield);
+      break;
+    }
+
+    case CAN_MO_BCM_SETUP_CONFIRM_2_ID:
+    {
+      CAN_MO_BCM_SETUP_2_t *msg = (CAN_MO_BCM_SETUP_2_t *)pRxMsg->Data;
+      DISPLAY_DATA_GearACC.g_acc_min_speed = msg->g_acc_min_speed;
+      DISPLAY_DATA_GearACC.g_acc_max_wspin = msg->g_acc_max_wspin;
+      DISPLAY_DATA_GearACC.g_acc_shift_rpm_1 = msg->g_acc_shift_rpm_1;
+      DISPLAY_DATA_GearACC.g_acc_shift_rpm_2 = msg->g_acc_shift_rpm_2;
+      DISPLAY_DATA_GearACC.g_acc_shift_rpm_3 = msg->g_acc_shift_rpm_3;
+
+      xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_GEAR_ACC, portyield);
+      break;
+    }
+
+    case CAN_MO_BCM_SETUP_CONFIRM_3_ID:
+    {
+      CAN_MO_BCM_SETUP_3_t *msg = (CAN_MO_BCM_SETUP_3_t *)pRxMsg->Data;
+      DISPLAY_DATA_GearControl.g_min_shift_delay = msg->g_min_shift_delay;
+      DISPLAY_DATA_GearControl.g_up_holdtime = msg->g_up_holdtime;
+      DISPLAY_DATA_GearControl.g_dn_holdtime = msg->g_dn_holdtime;
+      DISPLAY_DATA_GearControl.g_n_holdtime = msg->g_n_holdtime;
+      DISPLAY_DATA_Racepage.map = msg->map;
+      DISPLAY_DATA_Racepage.traction = msg->traction;
+
+      xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_CLUTCH_NORMAL | DISPLAY_EVENT_NEW_DATA_RACEPAGE, portyield);
+      break;
+    }
+
+    case CAN_MO_BCM_SETUP_CONFIRM_4_ID:
+    {
+      CAN_MO_BCM_SETUP_4_t *msg = (CAN_MO_BCM_SETUP_4_t *)pRxMsg->Data;
+      DISPLAY_DATA_ClutchACC.acc_clutch_p1 = msg->acc_clutch_p1;
+      DISPLAY_DATA_ClutchACC.acc_clutch_p2 = msg->acc_clutch_p2;
+      DISPLAY_DATA_ClutchACC.acc_clutch_k1 = msg->acc_clutch_k1;
+      DISPLAY_DATA_ClutchACC.acc_clutch_k2 = msg->acc_clutch_k2;
+      DISPLAY_DATA_ClutchACC.acc_clutch_k3 = msg->acc_clutch_k3;
+
+      xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_CLUTCH_ACC, portyield);
+      break;
     }
   }
-
-
-
-  // restart receive
-  HAL_CAN_Receive_IT(hcan, hcan->pRxMsg->FIFONumber);
-
 }
 
-/* USER CODE END 1 */
+static inline void CAN_RxLVPD(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)
+{
+  switch(pRxMsg->StdId)
+  {
+    case CAN_MO_LVPD_SETUP_CONFIRM_1_ID:
+    {
+      CAN_MO_LVPD_SETUP_1_t *msg = (CAN_MO_LVPD_SETUP_1_t *)pRxMsg->Data;
+      DISPLAY_DATA_PowerFan.fan_off_temp = msg->fan_off_temp;
+      DISPLAY_DATA_PowerFan.fan_on_temp = msg->fan_on_temp;
+      DISPLAY_DATA_PowerFan.fan_off_rpm = msg->fan_off_rpm;
+      DISPLAY_DATA_PowerFan.fan_on_rpm = msg->fan_on_rpm;
 
-/**
-  * @}
-  */
+      xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_POWER_FAN, portyield);
+      break;
+    }
+    case CAN_MO_LVPD_SETUP_CONFIRM_2_ID:
+     {
+       CAN_MO_LVPD_SETUP_2_t *msg = (CAN_MO_LVPD_SETUP_2_t *)pRxMsg->Data;
+       DISPLAY_DATA_PowerCurrent.enable_bitfield = msg->enable_bitfield;
+       DISPLAY_DATA_PowerCurrent.threshold_value[msg->threshold_multiplex] = msg->threshold_value;
 
-/**
-  * @}
-  */
+       xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_POWER_CURRENT, portyield);
+       break;
+     }
+  }
+}
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+static inline void CAN_RxMS4(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)
+{
+  switch(pRxMsg->StdId)
+  {
+    case CAN_MO_MS4_IRA_ID:
+    {
+      CAN_MO_MS4_IRA_t *msg = (CAN_MO_MS4_IRA_t *)pRxMsg->Data;
+      DISPLAY_DATA_Racepage.rev = (msg->rev_msb << 16) + msg->rev_lsb;
+      DISPLAY_DATA_Racepage.ath = msg->ath;
+
+      xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_RACEPAGE, portyield);
+      break;
+    }
+
+    case CAN_MO_MS4_SPEED_ID:
+    {
+      CAN_MO_MS4_SPEED_t *msg = (CAN_MO_MS4_SPEED_t *)pRxMsg->Data;
+      DISPLAY_DATA_Racepage.speed = (msg->speed_msb << 16) + msg->speed_lsb;
+
+      xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_RACEPAGE, portyield);
+      break;
+    }
+
+    case CAN_MO_MS4_GDA_ID:
+    {
+      CAN_MO_MS4_GDA_t *msg = (CAN_MO_MS4_GDA_t *)pRxMsg->Data;
+      DISPLAY_DATA_Racepage.gear = msg->gear;
+
+      xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_RACEPAGE, portyield);
+      break;
+    }
+  }
+}

@@ -7,6 +7,25 @@
 
 #define DISPLAY_TASK_STACK_SIZE 512
 
+typedef enum DISPLAY_NEW_DATA_EVENT
+{
+  DISPLAY_EVENT_NEW_DATA_RACEPAGE  = 0x01,
+  DISPLAY_EVENT_NEW_DATA_GEAR_CONTROL = 0x02,
+  DISPLAY_EVENT_NEW_DATA_GEAR_ACC = 0x04,
+  DISPLAY_EVENT_NEW_DATA_CLUTCH_NORMAL = 0x08,
+  DISPLAY_EVENT_NEW_DATA_CLUTCH_ACC = 0x10,
+  DISPLAY_EVENT_NEW_DATA_POWER_FAN = 0x20,
+  DISPLAY_EVENT_NEW_DATA_POWER_CURRENT = 0x40,
+
+} DISPLAY_NEW_DATA_EVENT_t;
+
+#define DISPLAY_EVENT_NEW_DATA_ALL (DISPLAY_EVENT_NEW_DATA_RACEPAGE |\
+                                    DISPLAY_EVENT_NEW_DATA_GEAR_CONTROL |\
+                                    DISPLAY_EVENT_NEW_DATA_GEAR_ACC |\
+                                    DISPLAY_EVENT_NEW_DATA_CLUTCH_NORMAL |\
+                                    DISPLAY_EVENT_NEW_DATA_CLUTCH_ACC\
+                                    )
+
 typedef struct DISPLAY_Clutch_Normal
 {
   uint8_t clutch_points;
@@ -45,7 +64,42 @@ typedef struct DISPLAY_GearACC
 
 } DISPLAY_GearACC_t;
 
+typedef struct DISPLAY_Racepage
+{
+  uint8_t traction; // traction control level: 0 - 11
+  uint8_t map; // mapping: 1 - 2
+  uint16_t rev;
+  uint8_t ath;
+  uint16_t speed;
+  uint8_t gear;
+
+} DISPLAY_Racepage_t;
+
+typedef struct DISPLAY_POWER_FAN
+{
+  uint8_t fan_off_temp;
+  uint8_t fan_on_temp;
+  uint8_t fan_off_rpm;
+  uint8_t fan_on_rpm;
+
+} DISPLAY_POWER_FAN_t;
+
+typedef struct DISPLAY_POWER_CURRENT
+{
+  uint16_t enable_bitfield;
+  uint8_t threshold_value[16];
+
+} DISPLAY_POWER_CURRENT_t;
+
+extern DISPLAY_Racepage_t DISPLAY_DATA_Racepage;
 extern DISPLAY_Clutch_Normal_t DISPLAY_DATA_ClutchNormal;
+extern DISPLAY_GearControl_t DISPLAY_DATA_GearControl;
+extern DISPLAY_GearACC_t DISPLAY_DATA_GearACC;
+extern DISPLAY_ClutchACC_t DISPLAY_DATA_ClutchACC;
+extern DISPLAY_POWER_FAN_t DISPLAY_DATA_PowerFan;
+extern DISPLAY_POWER_CURRENT_t DISPLAY_DATA_PowerCurrent;
+
+extern EventGroupHandle_t DISPLAY_NewDataEventHandle;
 
 HAL_StatusTypeDef DISPLAY_Init(void);
 
