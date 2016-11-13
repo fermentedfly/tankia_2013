@@ -1,6 +1,5 @@
 #include "display.h"
 #include "task.h"
-#include "cmsis_os.h"
 
 static TaskHandle_t DISPLAY_TaskHandle;
 
@@ -20,7 +19,7 @@ HAL_StatusTypeDef DISPLAY_Init(void)
 {
   DISPLAY_NewDataEventHandle = xEventGroupCreate();
 
-  xTaskCreate(DISPLAY_Task, "display", DISPLAY_TASK_STACK_SIZE, NULL, osPriorityNormal, &DISPLAY_TaskHandle);
+  xTaskCreate(DISPLAY_Task, "display", DISPLAY_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &DISPLAY_TaskHandle);
 
   return HAL_OK;
 }

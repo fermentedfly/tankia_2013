@@ -1,6 +1,5 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
-#include "cmsis_os.h"
 #include "adc.h"
 #include "can.h"
 #include "dma.h"
@@ -9,13 +8,14 @@
 #include "usb_otg.h"
 #include "gpio.h"
 #include "display.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
-osThreadId defaultTaskHandle;
+TaskHandle_t defaultTaskHandle;
 
 void SystemClock_Config(void);
 void Error_Handler(void);
-void MX_FREERTOS_Init(void);
-void StartDefaultTask(void const * argument);
+void StartDefaultTask(void *arg);
 
 int main(void)
 {
@@ -31,9 +31,9 @@ int main(void)
   MX_UART4_Init();
   MX_USB_OTG_FS_USB_Init();
 
-  MX_FREERTOS_Init();
+  xTaskCreate(StartDefaultTask, "default", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &defaultTaskHandle);
 
-  osKernelStart();
+  vTaskStartScheduler();
 
   while (1)
   {
@@ -100,14 +100,7 @@ unsigned long getRunTimeCounterValue(void)
   return 0;
 }
 
-void MX_FREERTOS_Init(void) {
-
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
-
-}
-
-void StartDefaultTask(void const * arg)
+void StartDefaultTask(void *arg)
 {
   HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
 
@@ -129,6 +122,6 @@ void StartDefaultTask(void const * arg)
   {
     HAL_CAN_Transmit_IT(&hcan1);
 
-    osDelay(1000);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
