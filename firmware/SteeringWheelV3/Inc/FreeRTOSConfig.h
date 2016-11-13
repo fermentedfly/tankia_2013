@@ -183,6 +183,12 @@ standard names. */
 
 /* USER CODE BEGIN Defines */   	      
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
+// task priorities
+#define TASK_PRIORITY_NORMAL (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY_MEDIUM (TASK_PRIORITY_NORMAL + 1)
+#define TASK_PRIORITY_HIGH (TASK_PRIORITY_MEDIUM + 1)
+
+
 /* USER CODE END Defines */ 
 
 #endif /* FREERTOS_CONFIG_H */
