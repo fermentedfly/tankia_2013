@@ -15,8 +15,7 @@ TaskHandle_t defaultTaskHandle;
 
 void SystemClock_Config(void);
 void Error_Handler(void);
-void MX_FREERTOS_Init(void);
-void StartDefaultTask(void * argument);
+void StartDefaultTask(void *arg);
 
 int main(void)
 {
@@ -32,9 +31,9 @@ int main(void)
   MX_UART4_Init();
   MX_USB_OTG_FS_USB_Init();
 
-  xTaskCreate(StartDefaultTask, "default", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY_NORMAL, &defaultTaskHandle);
+  xTaskCreate(StartDefaultTask, "default", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &defaultTaskHandle);
 
-  xPortStartScheduler();
+  vTaskStartScheduler();
 
   while (1)
   {
@@ -101,7 +100,7 @@ unsigned long getRunTimeCounterValue(void)
   return 0;
 }
 
-void StartDefaultTask(void * arg)
+void StartDefaultTask(void *arg)
 {
   HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
 
@@ -123,6 +122,6 @@ void StartDefaultTask(void * arg)
   {
     HAL_CAN_Transmit_IT(&hcan1);
 
-    vTaskDelay(1000);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
