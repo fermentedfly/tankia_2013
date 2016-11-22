@@ -96,5 +96,10 @@
 			<type>2</type>
 			<locationURI>$%7BPARENT-2-PROJECT_LOC%7D/STM32F4xx_HAL_Driver</locationURI>
 		</link>
+		<link>
+			<name>USB</name>
+			<type>2</type>
+			<locationURI>$%7BPARENT-2-PROJECT_LOC%7D/USB</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>

@@ -5,7 +5,7 @@
 #include "dma.h"
 #include "i2c.h"
 #include "usart.h"
-#include "usb_otg.h"
+#include "usb.h"
 #include "gpio.h"
 #include "display.h"
 #include "FreeRTOS.h"
@@ -34,6 +34,39 @@ CAN_HandleTypeDef hcan1 =
         },
     };
 
+static USBD_HandleTypeDef USBD_Device;
+
+static PCD_HandleTypeDef USB_hpcd = {
+  .Instance = USB_OTG_FS,
+  .Init = {
+    .dev_endpoints = 4,
+    .use_dedicated_ep1 = 0,
+    .ep0_mps = 0x40,
+    .dma_enable = 0,
+    .low_power_enable = 0,
+    .phy_itface = PCD_PHY_EMBEDDED,
+    .Sof_enable = 0,
+    .speed = PCD_SPEED_FULL,
+    .vbus_sensing_enable = DISABLE,
+    .lpm_enable = DISABLE
+  },
+  .pData = &USBD_Device,
+};
+
+static USBD_CDC_HandleTypeDef USBD_CDC_Device;
+
+static USBD_HandleTypeDef USBD_Device = {
+    .pData = (void*)&USB_hpcd,
+    .pClassData = (void*)&USBD_CDC_Device,
+};
+
+USB_Config_t USB_Config = {
+  .device = &USBD_Device,
+  .descriptors = &VCP_Desc,
+  .class = &USBD_CDC,
+  .interface = &USBD_CDC_IF
+};
+
 void SystemClock_Config(void);
 void Error_Handler(void);
 void StartDefaultTask(void *arg);
@@ -52,7 +85,7 @@ int main(void)
 
   configASSERT(CAN_Init(&hcan1) == HAL_OK);
 
-  MX_USB_OTG_FS_USB_Init();
+  configASSERT(USB_Init(&USB_Config) == HAL_OK);
 
   SEGGER_SYSVIEW_Conf();
 
