@@ -2,40 +2,34 @@
 #include "gpio.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "queue.h"
-#include "display.h"
-#include "event_groups.h"
 
-static CanTxMsgTypeDef        TxMessage;
-static CanRxMsgTypeDef        RxMessage;
-
-CAN_HandleTypeDef hcan1;
+static CAN_HandleTypeDef *CAN1_Handle;
 
 void CAN1_TX_IRQHandler(void)
 {
   traceISR_ENTER();
-  HAL_CAN_IRQHandler(&hcan1);
+  HAL_CAN_IRQHandler(CAN1_Handle);
   traceISR_EXIT();
 }
 
 void CAN1_RX0_IRQHandler(void)
 {
   traceISR_ENTER();
-  HAL_CAN_IRQHandler(&hcan1);
+  HAL_CAN_IRQHandler(CAN1_Handle);
   traceISR_EXIT();
 }
 
 void CAN1_RX1_IRQHandler(void)
 {
   traceISR_ENTER();
-  HAL_CAN_IRQHandler(&hcan1);
+  HAL_CAN_IRQHandler(CAN1_Handle);
   traceISR_EXIT();
 }
 
 void CAN1_SCE_IRQHandler(void)
 {
   traceISR_ENTER();
-  HAL_CAN_IRQHandler(&hcan1);
+  HAL_CAN_IRQHandler(CAN1_Handle);
   traceISR_EXIT();
 }
 
@@ -87,29 +81,16 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 
 HAL_StatusTypeDef CAN_Init(CAN_HandleTypeDef* hcan)
 {
-  hcan->Instance = CAN1;
-  hcan->Init.Prescaler = 21;
-  hcan->Init.Mode = CAN_MODE_LOOPBACK;
-  hcan->Init.SJW = CAN_SJW_1TQ;
-  hcan->Init.BS1 = CAN_BS1_13TQ;
-  hcan->Init.BS2 = CAN_BS2_2TQ;
-  hcan->Init.TTCM = DISABLE;
-  hcan->Init.ABOM = DISABLE;
-  hcan->Init.AWUM = DISABLE;
-  hcan->Init.NART = DISABLE;
-  hcan->Init.RFLM = DISABLE;
-  hcan->Init.TXFP = DISABLE;
+  CAN1_Handle = hcan;
 
-  configASSERT(HAL_CAN_Init(&hcan1) == HAL_OK);
-
-  hcan->pTxMsg = &TxMessage;
-  hcan->pRxMsg = &RxMessage;
+  configASSERT(HAL_CAN_Init(hcan) == HAL_OK);
 
   return HAL_OK;
 }
 
-void CAN_StartReceive(CAN_HandleTypeDef* hcan)
+void CAN_StartReceive(CAN_HandleTypeDef* hcan, CanRxMsgTypeDef *rx_msg)
 {
+  hcan->pRxMsg = rx_msg;
   HAL_CAN_Receive_IT(hcan, CAN_FIFO0);
   HAL_CAN_Receive_IT(hcan, CAN_FIFO1);
 }
