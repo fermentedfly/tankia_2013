@@ -84,7 +84,6 @@ int main(void)
   MX_UART4_Init();
 
   configASSERT(CAN_Init(&hcan1) == HAL_OK);
-
   configASSERT(USB_Init(&USB_Config) == HAL_OK);
 
   SEGGER_SYSVIEW_Conf();
