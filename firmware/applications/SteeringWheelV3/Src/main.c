@@ -1,17 +1,18 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
-#include "adc.h"
-#include "can.h"
-#include "dma.h"
-#include "i2c.h"
-#include "usart.h"
-#include "usb.h"
-#include "gpio.h"
-#include "display.h"
+#include "drv_adc.h"
+#include "drv_can.h"
+#include "drv_dma.h"
+#include "drv_i2c.h"
+#include "drv_usart.h"
+#include "drv_usb.h"
+#include "drv_gpio.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "SEGGER_SYSVIEW.h"
 #include "can_messages.h"
+#include "display.h"
+#include "dev_max7313.h"
 
 TaskHandle_t defaultTaskHandle;
 
@@ -67,6 +68,50 @@ USB_Config_t USB_Config = {
   .interface = &USBD_CDC_IF
 };
 
+I2C_HandleTypeDef hi2c1 ={
+    .Instance = I2C1,
+    .Init.ClockSpeed = 80000,
+    .Init.DutyCycle = I2C_DUTYCYCLE_2,
+    .Init.OwnAddress1 = 0,
+    .Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT,
+    .Init.DualAddressMode = I2C_DUALADDRESS_DISABLE,
+    .Init.OwnAddress2 = 0,
+    .Init.GeneralCallMode = I2C_GENERALCALL_DISABLE,
+    .Init.NoStretchMode = I2C_NOSTRETCH_DISABLE,
+};
+
+MAX7313_Config_t max7313_config = {
+    .i2c_handle = &hi2c1,
+    .i2c_address = 0b0100000 << 1,
+
+    .blink_enabled = 0,
+    .global_intensity_enabled = 1,
+    .master_intensity = 0, //no PWM
+
+    .port_config = {
+        .port_low = {
+            .port_0 = 0,
+            .port_1 = 0,
+            .port_2 = 0,
+            .port_3 = 0,
+            .port_4 = 0,
+            .port_5 = 0,
+            .port_6 = 0,
+            .port_7 = 0,
+        },
+        .port_high = {
+            .port_8  = 0,
+            .port_9  = 0,
+            .port_10 = 0,
+            .port_11 = 0,
+            .port_12 = 1,
+            .port_13 = 1,
+            .port_14 = 1,
+            .port_15 = 1,
+        },
+    },
+};
+
 void SystemClock_Config(void);
 void Error_Handler(void);
 void StartDefaultTask(void *arg);
@@ -80,10 +125,10 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_ADC1_Init();
-  MX_I2C1_Init();
   MX_UART4_Init();
 
   configASSERT(CAN_Init(&hcan1) == HAL_OK);
+  configASSERT(I2C_Init(&hi2c1) == HAL_OK);
   configASSERT(USB_Init(&USB_Config) == HAL_OK);
 
   SEGGER_SYSVIEW_Conf();
@@ -162,6 +207,9 @@ void StartDefaultTask(void *arg)
   HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
 
   CAN_MESSAGES_Init(&hcan1);
+  configASSERT(DISPLAY_Init() == HAL_OK);
+  configASSERT(MAX7313_Init(&max7313_config) == HAL_OK);
+
 
   CanTxMsgTypeDef TxMessage = {
       .IDE = CAN_ID_STD,
@@ -177,8 +225,6 @@ void StartDefaultTask(void *arg)
   };
 
   hcan1.pTxMsg = &TxMessage;
-
-  configASSERT(DISPLAY_Init() == HAL_OK);
 
   for(;;)
   {

@@ -1,5 +1,5 @@
-#include "adc.h"
-#include "gpio.h"
+#include "drv_adc.h"
+#include "drv_gpio.h"
 
 ADC_HandleTypeDef hadc1;
 

@@ -1,4 +1,4 @@
-#include "dma.h"
+#include "drv_dma.h"
 void MX_DMA_Init(void) 
 {
   /* DMA controller clock enable */

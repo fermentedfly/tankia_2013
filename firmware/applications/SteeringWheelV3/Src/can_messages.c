@@ -6,11 +6,11 @@
  */
 
 #include "can_messages.h"
-#include "can.h"
+#include "display.h"
+#include "drv_can.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-#include "display.h"
 #include "event_groups.h"
 
 static CanRxMsgTypeDef CAN1_RxMessage;

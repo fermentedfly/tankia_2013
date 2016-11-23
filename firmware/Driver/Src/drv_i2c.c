@@ -1,25 +1,29 @@
-#include "i2c.h"
-#include "gpio.h"
+#include "drv_i2c.h"
+#include "drv_gpio.h"
 
-I2C_HandleTypeDef hi2c1;
+I2C_HandleTypeDef *I2C1_Handle;
 
-/* I2C1 init function */
-void MX_I2C1_Init(void)
+void I2C1_EV_IRQHandler(void)
 {
-  hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 80000;
-  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
-  hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c1.Init.OwnAddress2 = 0;
-  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  HAL_I2C_EV_IRQHandler(I2C1_Handle);
+}
 
+void I2C1_ER_IRQHandler(void)
+{
+  HAL_I2C_ER_IRQHandler(I2C1_Handle);
+}
+
+HAL_StatusTypeDef I2C_Init(I2C_HandleTypeDef *handle)
+{
+  if(handle->Instance == I2C1)
+  {
+    I2C1_Handle = handle;
+  }
+  if (HAL_I2C_Init(handle) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+  return HAL_OK;
 }
 
 void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
