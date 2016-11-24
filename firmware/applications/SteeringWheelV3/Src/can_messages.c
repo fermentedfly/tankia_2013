@@ -12,6 +12,7 @@
 #include "task.h"
 #include "queue.h"
 #include "event_groups.h"
+#include "rpm_leds.h"
 
 static CanRxMsgTypeDef CAN1_RxMessage;
 
@@ -79,6 +80,8 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 {
   configASSERT(hcan->pRxMsg->IDE == CAN_ID_STD);
 
+  HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
+
   portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
   if(hcan->pRxMsg->FMI == CAN_MO_BCM_FILTER_NR)
@@ -96,10 +99,12 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
     CAN_MESSAGES_RxMS4(hcan->pRxMsg, &xHigherPriorityTaskWoken);
   }
 
-  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-
   // restart receive
   HAL_CAN_Receive_IT(hcan, hcan->pRxMsg->FIFONumber);
+
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+  HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
 }
 
 static inline void CAN_MESSAGES_RxBCM(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)
@@ -197,7 +202,10 @@ static inline void CAN_MESSAGES_RxMS4(CanRxMsgTypeDef *pRxMsg, BaseType_t *porty
       DISPLAY_DATA_Racepage.rev = (msg->rev_msb << 16) + msg->rev_lsb;
       DISPLAY_DATA_Racepage.ath = msg->ath;
 
+      RPM_LEDS_rev = (msg->rev_msb << 16) + msg->rev_lsb;
+
       xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_RACEPAGE, portyield);
+      xEventGroupSetBitsFromISR(RPM_LEDS_NewDataEventHandle, RPM_LEDS_EVENT_NEW_DATA_REV, portyield);
       break;
     }
 

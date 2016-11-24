@@ -99,6 +99,8 @@ static void _cbSendSystemDesc(void) {
   SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
   SEGGER_SYSVIEW_SendSysDesc("I#35=CAN1_TX_IRQHandler");
   SEGGER_SYSVIEW_SendSysDesc("I#36=CAN1_RX0_IRQHandler");
+  SEGGER_SYSVIEW_SendSysDesc("I#47=I2C1_EV_IRQHandler");
+  SEGGER_SYSVIEW_SendSysDesc("I#48=I2C1_ER_IRQHandler");
 }
 
 /*********************************************************************

@@ -1,16 +1,21 @@
 #include "drv_i2c.h"
 #include "drv_gpio.h"
+#include "FreeRTOS.h"
 
 I2C_HandleTypeDef *I2C1_Handle;
 
 void I2C1_EV_IRQHandler(void)
 {
+  traceISR_ENTER();
   HAL_I2C_EV_IRQHandler(I2C1_Handle);
+  traceISR_EXIT();
 }
 
 void I2C1_ER_IRQHandler(void)
 {
+  traceISR_ENTER();
   HAL_I2C_ER_IRQHandler(I2C1_Handle);
+  traceISR_EXIT();
 }
 
 HAL_StatusTypeDef I2C_Init(I2C_HandleTypeDef *handle)

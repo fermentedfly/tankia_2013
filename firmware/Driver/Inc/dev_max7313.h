@@ -22,7 +22,7 @@ typedef struct __attribute__((__packed__)) MAX7313_RegisterContent_MasterIntensi
 
 } MAX7313_RegisterContent_MasterIntensity_t;
 
-typedef struct __attribute__((__packed__)) MAX7313_RegisterContent_PortConfiguration_Low
+typedef struct __attribute__((__packed__)) MAX7313_RegisterContent_PortConfiguration
 {
   uint32_t port_0   :1;
   uint32_t port_1   :1;
@@ -32,10 +32,6 @@ typedef struct __attribute__((__packed__)) MAX7313_RegisterContent_PortConfigura
   uint32_t port_5   :1;
   uint32_t port_6   :1;
   uint32_t port_7   :1;
-} MAX7313_RegisterContent_PortConfiguration_Low_t;
-
-typedef struct __attribute__((__packed__)) MAX7313_RegisterContent_PortConfiguration_High
-{
   uint32_t port_8   :1;
   uint32_t port_9   :1;
   uint32_t port_10  :1;
@@ -45,14 +41,28 @@ typedef struct __attribute__((__packed__)) MAX7313_RegisterContent_PortConfigura
   uint32_t port_14  :1;
   uint32_t port_15  :1;
 
-} MAX7313_RegisterContent_PortConfiguration_High_t;
-
-typedef struct __attribute__((__packed__)) MAX7313_RegisterContent_PortConfiguration
-{
-  MAX7313_RegisterContent_PortConfiguration_Low_t port_low;
-  MAX7313_RegisterContent_PortConfiguration_High_t port_high;
-
 } MAX7313_RegisterContent_PortConfiguration_t;
+
+typedef struct __attribute__((__packed__)) MAX7313_RegisterContent_PortIntensity
+{
+  uint32_t port_0   :4;
+  uint32_t port_1   :4;
+  uint32_t port_2   :4;
+  uint32_t port_3   :4;
+  uint32_t port_4   :4;
+  uint32_t port_5   :4;
+  uint32_t port_6   :4;
+  uint32_t port_7   :4;
+  uint32_t port_8   :4;
+  uint32_t port_9   :4;
+  uint32_t port_10  :4;
+  uint32_t port_11  :4;
+  uint32_t port_12  :4;
+  uint32_t port_13  :4;
+  uint32_t port_14  :4;
+  uint32_t port_15  :4;
+
+} MAX7313_RegisterContent_PortIntensity_t;
 
 typedef struct MAX7313_Config
 {
@@ -65,6 +75,7 @@ typedef struct MAX7313_Config
   uint8_t master_intensity;
 
   MAX7313_RegisterContent_PortConfiguration_t port_config;
+  MAX7313_RegisterContent_PortIntensity_t port_intensity;
 
 } MAX7313_Config_t;
 

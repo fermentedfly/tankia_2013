@@ -19,7 +19,7 @@ HAL_StatusTypeDef DISPLAY_Init(void)
 {
   DISPLAY_NewDataEventHandle = xEventGroupCreate();
 
-  xTaskCreate(DISPLAY_Task, "display", DISPLAY_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &DISPLAY_TaskHandle);
+  xTaskCreate(DISPLAY_Task, "DISPLAY", DISPLAY_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &DISPLAY_TaskHandle);
 
   return HAL_OK;
 }
@@ -36,7 +36,5 @@ void DISPLAY_Task(void *arg)
     {
       HAL_GPIO_TogglePin(LED_3_GPIO_Port, LED_3_Pin);
     }
-
-
   }
 }

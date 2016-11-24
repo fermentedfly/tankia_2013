@@ -21,22 +21,20 @@ HAL_StatusTypeDef MAX7313_Init(MAX7313_Config_t *config)
       return HAL_ERROR;
     }
 
-  if(config->global_intensity_enabled)
-  {
-    // write master intensity
-    MAX7313_RegisterContent_MasterIntensity_t reg_intensity = {
-        .master_intensity = config->master_intensity,
-    };
+  // write master intensity
+  MAX7313_RegisterContent_MasterIntensity_t reg_intensity = {
+      .master_intensity = config->master_intensity,
+  };
 
-    if(HAL_I2C_Mem_Write(config->i2c_handle, config->i2c_address, MAX7313_Register_MasterIntensity, 1, (uint8_t *)&reg_intensity, sizeof(reg_intensity), 100) != HAL_OK)
-    {
-      return HAL_ERROR;
-    }
-  }
-  else
+  if(HAL_I2C_Mem_Write(config->i2c_handle, config->i2c_address, MAX7313_Register_MasterIntensity, 1, (uint8_t *)&reg_intensity, sizeof(reg_intensity), 100) != HAL_OK)
   {
-    // TODO implement
-    configASSERT(0);
+    return HAL_ERROR;
+  }
+
+  // write port intensity
+  if(HAL_I2C_Mem_Write(config->i2c_handle, config->i2c_address, MAX7313_Register_OutputIntensity_1_0, 1, (uint8_t *)&config->port_intensity, sizeof(config->port_intensity), 100) != HAL_OK)
+  {
+    return HAL_ERROR;
   }
 
   // configure IO ports
@@ -50,6 +48,6 @@ HAL_StatusTypeDef MAX7313_Init(MAX7313_Config_t *config)
 
 HAL_StatusTypeDef MAX7313_WritePort(MAX7313_Config_t *config, uint16_t value)
 {
-  return HAL_I2C_Mem_Write(config->i2c_handle, config->i2c_address, MAX7313_Register_BlinkPhase0_Low, 1, (uint8_t*)&value, sizeof(value), 100);
+  return HAL_I2C_Mem_Write_IT(config->i2c_handle, config->i2c_address, MAX7313_Register_BlinkPhase0_Low, 1, (uint8_t*)&value, sizeof(value));
 }
 

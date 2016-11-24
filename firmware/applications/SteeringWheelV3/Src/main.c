@@ -13,6 +13,7 @@
 #include "can_messages.h"
 #include "display.h"
 #include "dev_max7313.h"
+#include "rpm_leds.h"
 
 TaskHandle_t defaultTaskHandle;
 
@@ -86,29 +87,43 @@ MAX7313_Config_t max7313_config = {
 
     .blink_enabled = 0,
     .global_intensity_enabled = 1,
-    .master_intensity = 0, //no PWM
+    .master_intensity =0, //no PWM
 
     .port_config = {
-        .port_low = {
-            .port_0 = 0,
-            .port_1 = 0,
-            .port_2 = 0,
-            .port_3 = 0,
-            .port_4 = 0,
-            .port_5 = 0,
-            .port_6 = 0,
-            .port_7 = 0,
-        },
-        .port_high = {
-            .port_8  = 0,
-            .port_9  = 0,
-            .port_10 = 0,
-            .port_11 = 0,
-            .port_12 = 1,
-            .port_13 = 1,
-            .port_14 = 1,
-            .port_15 = 1,
-        },
+          .port_0 = 0,
+          .port_1 = 0,
+          .port_2 = 0,
+          .port_3 = 0,
+          .port_4 = 0,
+          .port_5 = 0,
+          .port_6 = 0,
+          .port_7 = 0,
+          .port_8  = 0,
+          .port_9  = 0,
+          .port_10 = 0,
+          .port_11 = 0,
+          .port_12 = 1,
+          .port_13 = 1,
+          .port_14 = 1,
+          .port_15 = 1,
+    },
+    .port_intensity = {
+        .port_0 = 0x0,
+        .port_1 = 0x1,
+        .port_2 = 0x2,
+        .port_3 = 0x3,
+        .port_4 = 0x4,
+        .port_5 = 0x5,
+        .port_6 = 0x6,
+        .port_7 = 0x7,
+        .port_8  = 0x8,
+        .port_9  = 0x9,
+        .port_10 = 0xA,
+        .port_11 = 0xB,
+        .port_12 = 0xC,
+        .port_13 = 0xD,
+        .port_14 = 0xE,
+        .port_15 = 0xF,
     },
 };
 
@@ -127,11 +142,11 @@ int main(void)
   MX_ADC1_Init();
   MX_UART4_Init();
 
+  SEGGER_SYSVIEW_Conf();
+
   configASSERT(CAN_Init(&hcan1) == HAL_OK);
   configASSERT(I2C_Init(&hi2c1) == HAL_OK);
   configASSERT(USB_Init(&USB_Config) == HAL_OK);
-
-  SEGGER_SYSVIEW_Conf();
 
   xTaskCreate(StartDefaultTask, "default", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &defaultTaskHandle);
 
@@ -208,7 +223,9 @@ void StartDefaultTask(void *arg)
 
   CAN_MESSAGES_Init(&hcan1);
   configASSERT(DISPLAY_Init() == HAL_OK);
-  configASSERT(MAX7313_Init(&max7313_config) == HAL_OK);
+  configASSERT(RPM_LEDS_Init(&max7313_config) == HAL_OK);
+
+  MAX7313_WritePort(&max7313_config, 0xFFFF);
 
 
   CanTxMsgTypeDef TxMessage = {
@@ -230,6 +247,6 @@ void StartDefaultTask(void *arg)
   {
     HAL_CAN_Transmit_IT(&hcan1);
 
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
   }
 }
