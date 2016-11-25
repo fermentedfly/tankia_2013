@@ -15,7 +15,7 @@
 #include "dev_max7313.h"
 #include "rpm_leds.h"
 
-TaskHandle_t defaultTaskHandle;
+TaskHandle_t SteeringWheelMainTaskHandle;
 
 CAN_HandleTypeDef hcan1 =
     {
@@ -81,6 +81,31 @@ I2C_HandleTypeDef hi2c1 ={
     .Init.NoStretchMode = I2C_NOSTRETCH_DISABLE,
 };
 
+ADC_HandleTypeDef hadc1 =
+{
+    .Instance = ADC1,
+    .Init = {
+        .ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4,
+        .Resolution = ADC_RESOLUTION_12B,
+        .ScanConvMode = DISABLE,
+        .ContinuousConvMode = DISABLE,
+        .DiscontinuousConvMode = DISABLE,
+        .ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE,
+        .DataAlign = ADC_DATAALIGN_RIGHT,
+        .NbrOfConversion = 1,
+        .DMAContinuousRequests = DISABLE,
+        .EOCSelection = ADC_EOC_SINGLE_CONV,
+    },
+};
+
+ADC_ChannelConfTypeDef channel_4_config =
+{
+    .Channel = ADC_CHANNEL_4,
+    .Rank = 1,
+    .SamplingTime = ADC_SAMPLETIME_3CYCLES,
+};
+
+
 MAX7313_Config_t max7313_config = {
     .i2c_handle = &hi2c1,
     .i2c_address = 0b0100000 << 1,
@@ -128,8 +153,7 @@ MAX7313_Config_t max7313_config = {
 };
 
 void SystemClock_Config(void);
-void Error_Handler(void);
-void StartDefaultTask(void *arg);
+void SteeringWheelMainTask(void *arg);
 
 int main(void)
 {
@@ -139,7 +163,6 @@ int main(void)
 
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_ADC1_Init();
   MX_UART4_Init();
 
   SEGGER_SYSVIEW_Conf();
@@ -148,12 +171,66 @@ int main(void)
   configASSERT(I2C_Init(&hi2c1) == HAL_OK);
   configASSERT(USB_Init(&USB_Config) == HAL_OK);
 
-  xTaskCreate(StartDefaultTask, "default", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &defaultTaskHandle);
+  configASSERT(ADC_Init(&hadc1) == HAL_OK);
+  configASSERT(HAL_ADC_ConfigChannel(&hadc1, &channel_4_config) == HAL_OK);
+
+  xTaskCreate(SteeringWheelMainTask, "Main", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &SteeringWheelMainTaskHandle);
 
   vTaskStartScheduler();
 
   while (1)
   {
+  }
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+}
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* handle)
+{
+  static CanTxMsgTypeDef ClutchTxMessage = {
+      .IDE = CAN_ID_STD,
+      .StdId = 0x010,
+      .DLC = 1,
+  };
+
+  ClutchTxMessage.Data[0] = HAL_ADC_GetValue(handle) / 16; //convert 12Bit ADC to 8Bit Clutch
+  CAN_MESSAGES_TransmitFromISR(&hcan1, &ClutchTxMessage);
+}
+
+void SteeringWheelMainTask(void *arg)
+{
+  HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
+
+  CAN_MESSAGES_Init(&hcan1);
+  configASSERT(DISPLAY_Init() == HAL_OK);
+  configASSERT(RPM_LEDS_Init(&max7313_config) == HAL_OK);
+  configASSERT(ADC_StartContinousConversion(&hadc1, 500) == HAL_OK);
+
+  MAX7313_WritePort(&max7313_config, 0xFFFF);
+
+  static CanTxMsgTypeDef TxMessage = {
+      .IDE = CAN_ID_STD,
+      .StdId = 0x200,
+      .DLC = 7,
+      .Data[0] = 0x01,
+      .Data[1] = 0x02,
+      .Data[2] = 0x03,
+      .Data[3] = 0x04,
+      .Data[4] = 0x05,
+      .Data[5] = 0x06,
+      .Data[6] = 0x07,
+  };
+
+  for(;;)
+  {
+    CAN_MESSAGES_Transmit(&hcan1, &TxMessage);
+
+    vTaskDelay(100 / portTICK_PERIOD_MS);
   }
 }
 
@@ -193,16 +270,9 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 15, 0);
 }
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  if (htim->Instance == TIM1) {
-    HAL_IncTick();
-  }
-}
-
 void Error_Handler(void)
 {
-  while(1) 
+  while(1)
   {
   }
 }
@@ -215,38 +285,4 @@ void configureTimerForRunTimeStats(void)
 unsigned long getRunTimeCounterValue(void)
 {
   return 0;
-}
-
-void StartDefaultTask(void *arg)
-{
-  HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
-
-  CAN_MESSAGES_Init(&hcan1);
-  configASSERT(DISPLAY_Init() == HAL_OK);
-  configASSERT(RPM_LEDS_Init(&max7313_config) == HAL_OK);
-
-  MAX7313_WritePort(&max7313_config, 0xFFFF);
-
-
-  CanTxMsgTypeDef TxMessage = {
-      .IDE = CAN_ID_STD,
-      .StdId = 0x200,
-      .DLC = 7,
-      .Data[0] = 0x01,
-      .Data[1] = 0x02,
-      .Data[2] = 0x03,
-      .Data[3] = 0x04,
-      .Data[4] = 0x05,
-      .Data[5] = 0x06,
-      .Data[6] = 0x07,
-  };
-
-  hcan1.pTxMsg = &TxMessage;
-
-  for(;;)
-  {
-    HAL_CAN_Transmit_IT(&hcan1);
-
-    vTaskDelay(10 / portTICK_PERIOD_MS);
-  }
 }

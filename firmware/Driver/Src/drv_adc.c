@@ -1,40 +1,50 @@
 #include "drv_adc.h"
 #include "drv_gpio.h"
+#include "FreeRTOS.h"
+#include "timers.h"
 
-ADC_HandleTypeDef hadc1;
+static ADC_HandleTypeDef *ADC_Handle_;
+static TimerHandle_t ADC_ConversionTimerHandle_;
 
-void MX_ADC1_Init(void)
+static void ADC_TimerCallback(TimerHandle_t xTimer);
+
+void ADC_IRQHandler(void)
 {
-  ADC_ChannelConfTypeDef sConfig;
+  HAL_ADC_IRQHandler(ADC_Handle_);
+}
 
-    /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
-    */
-  hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
-  hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+HAL_StatusTypeDef ADC_Init(ADC_HandleTypeDef *handle)
+{
+  ADC_Handle_ = handle;
+
+  ADC_ConversionTimerHandle_ = xTimerCreate("ADC Conv", 1, pdTRUE, NULL, ADC_TimerCallback);
+
+  if (HAL_ADC_Init(handle) != HAL_OK)
   {
-    Error_Handler();
+    return HAL_ERROR;
   }
 
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
-  sConfig.Channel = ADC_CHANNEL_4;
-  sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  return HAL_OK;
+}
 
+HAL_StatusTypeDef ADC_StartSingleConversion(ADC_HandleTypeDef *handle)
+{
+  return HAL_ADC_Start_IT(handle);
+}
+
+HAL_StatusTypeDef ADC_StartContinousConversion(ADC_HandleTypeDef *handle, TickType_t period)
+{
+  vTimerSetTimerID(ADC_ConversionTimerHandle_, handle);
+  xTimerChangePeriod(ADC_ConversionTimerHandle_, period, portMAX_DELAY);
+  xTimerStart(ADC_ConversionTimerHandle_, portMAX_DELAY);
+
+  return HAL_OK;
+}
+
+static void ADC_TimerCallback(TimerHandle_t xTimer)
+{
+  ADC_HandleTypeDef *handle = (ADC_HandleTypeDef *)pvTimerGetTimerID(xTimer);
+  HAL_ADC_Start_IT(handle);
 }
 
 void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
@@ -52,6 +62,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(ADC1_Clutch_GPIO_Port, &GPIO_InitStruct);
+
+    /* Peripheral interrupt init */
+    HAL_NVIC_SetPriority(ADC_IRQn, 6, 0);
+    HAL_NVIC_EnableIRQ(ADC_IRQn);
   }
 }
 
@@ -66,6 +80,9 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
     PA4     ------> ADC1_IN4 
     */
     HAL_GPIO_DeInit(ADC1_Clutch_GPIO_Port, ADC1_Clutch_Pin);
+
+    /* Peripheral interrupt Deinit*/
+    HAL_NVIC_DisableIRQ(ADC_IRQn);
 
   }
 } 

@@ -14,6 +14,9 @@
 #include "event_groups.h"
 #include "rpm_leds.h"
 
+QueueHandle_t CAN_MESSAGES_TxQueue;
+
+static TaskHandle_t CAN_MESSAGES_TxTaskHandle;
 static CanRxMsgTypeDef CAN1_RxMessage;
 
 static CAN_FilterConfTypeDef CAN_filter_BCM = {
@@ -64,9 +67,14 @@ static CAN_FilterConfTypeDef CAN_filter_MS4 = {
 static inline void CAN_MESSAGES_RxBCM(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
 static inline void CAN_MESSAGES_RxLVPD(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
 static inline void CAN_MESSAGES_RxMS4(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
+static void CAN_MESSAGES_TxTask(void *arg);
 
 void CAN_MESSAGES_Init(CAN_HandleTypeDef* hcan)
 {
+  CAN_MESSAGES_TxQueue = xQueueCreate(20, sizeof(CanTxMsgTypeDef));
+
+  xTaskCreate(CAN_MESSAGES_TxTask, "CAN TX", CAN_MESSAGES_TX_TASK_STACK_SIZE, hcan, tskIDLE_PRIORITY + 2, &CAN_MESSAGES_TxTaskHandle);
+
   if(hcan->Instance == CAN1)
   {
     CAN_StartReceive(hcan, &CAN1_RxMessage);
@@ -74,6 +82,20 @@ void CAN_MESSAGES_Init(CAN_HandleTypeDef* hcan)
   configASSERT(HAL_CAN_ConfigFilter(hcan, &CAN_filter_MS4) == HAL_OK);
   configASSERT(HAL_CAN_ConfigFilter(hcan, &CAN_filter_LVPD) == HAL_OK);
   configASSERT(HAL_CAN_ConfigFilter(hcan, &CAN_filter_BCM) == HAL_OK);
+}
+
+void CAN_MESSAGES_Transmit(CAN_HandleTypeDef* hcan, CanTxMsgTypeDef *tx_msg)
+{
+  xQueueSend(CAN_MESSAGES_TxQueue, tx_msg, portMAX_DELAY);
+}
+
+void CAN_MESSAGES_TransmitFromISR(CAN_HandleTypeDef* hcan, CanTxMsgTypeDef *tx_msg)
+{
+  portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
+  xQueueSendFromISR(CAN_MESSAGES_TxQueue, tx_msg, &xHigherPriorityTaskWoken);
+
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
@@ -227,4 +249,19 @@ static inline void CAN_MESSAGES_RxMS4(CanRxMsgTypeDef *pRxMsg, BaseType_t *porty
       break;
     }
   }
+}
+
+static void CAN_MESSAGES_TxTask(void *arg)
+{
+  CAN_HandleTypeDef *handle = (CAN_HandleTypeDef *)arg;
+  CanTxMsgTypeDef tx_msg;
+
+  while(1)
+  {
+    xQueueReceive(CAN_MESSAGES_TxQueue, &tx_msg, portMAX_DELAY);
+
+    handle->pTxMsg = &tx_msg;
+    configASSERT(HAL_CAN_Transmit_IT(handle) == HAL_OK);
+  }
+
 }

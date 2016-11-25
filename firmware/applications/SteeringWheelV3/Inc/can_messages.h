@@ -10,7 +10,9 @@
 
 #include "stm32f4xx_hal.h"
 
+#define CAN_MESSAGES_TX_TASK_STACK_SIZE 128
 #define CAN1_BANK_NUMBER 28
+#define CAN_MESSAGES_EVENTS_ALL 0xFFFFFFFF
 
 // CAN Message IDS
 
@@ -165,5 +167,7 @@ typedef struct __attribute__((__packed__)) CAN_MO_MS4_SBDB
 } CAN_MO_MS4_SBDB_t;
 
 void CAN_MESSAGES_Init(CAN_HandleTypeDef* hcan);
+void CAN_MESSAGES_Transmit(CAN_HandleTypeDef* hcan, CanTxMsgTypeDef *tx_msg);
+void CAN_MESSAGES_TransmitFromISR(CAN_HandleTypeDef* hcan, CanTxMsgTypeDef *tx_msg);
 
 #endif /* INC_CAN_MESSAGES_H_ */
