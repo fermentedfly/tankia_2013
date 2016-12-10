@@ -4,8 +4,13 @@
 #include "stm32f4xx_hal.h"
 #include "FreeRTOS.h"
 #include "event_groups.h"
+#include "drv_usart.h"
 
 #define DISPLAY_TASK_STACK_SIZE 512
+
+#define DISPLAY_DC_1 0x11
+#define DISPLAY_ESC 0x1B
+#define DISPLAY_ACK 0x06
 
 typedef enum DISPLAY_NEW_DATA_EVENT
 {
@@ -91,6 +96,12 @@ typedef struct DISPLAY_POWER_CURRENT
 
 } DISPLAY_POWER_CURRENT_t;
 
+typedef struct DISPLAY_Config
+{
+  UART_Config_t *uart_config;
+
+} DISPLAY_Config_t;
+
 extern DISPLAY_Racepage_t DISPLAY_DATA_Racepage;
 extern DISPLAY_Clutch_Normal_t DISPLAY_DATA_ClutchNormal;
 extern DISPLAY_GearControl_t DISPLAY_DATA_GearControl;
@@ -101,7 +112,7 @@ extern DISPLAY_POWER_CURRENT_t DISPLAY_DATA_PowerCurrent;
 
 extern EventGroupHandle_t DISPLAY_NewDataEventHandle;
 
-HAL_StatusTypeDef DISPLAY_Init(void);
+HAL_StatusTypeDef DISPLAY_Init(DISPLAY_Config_t *config);
 
 
 #endif

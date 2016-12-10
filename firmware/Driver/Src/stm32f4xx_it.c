@@ -166,21 +166,7 @@ void EXTI4_IRQHandler(void)
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
 }
 
-/**
-* @brief This function handles DMA1 stream2 global interrupt.
-*/
-void DMA1_Stream2_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_uart4_rx);
-}
 
-/**
-* @brief This function handles DMA1 stream4 global interrupt.
-*/
-void DMA1_Stream4_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_uart4_tx);
-}
 
 /**
 * @brief This function handles EXTI line[9:5] interrupts.
@@ -206,10 +192,3 @@ void EXTI15_10_IRQHandler(void)
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
 }
 
-/**
-* @brief This function handles UART4 global interrupt.
-*/
-void UART4_IRQHandler(void)
-{
-  HAL_UART_IRQHandler(&huart4);
-}

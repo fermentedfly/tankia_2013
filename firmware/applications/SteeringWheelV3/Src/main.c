@@ -105,6 +105,55 @@ ADC_ChannelConfTypeDef channel_4_config =
     .SamplingTime = ADC_SAMPLETIME_3CYCLES,
 };
 
+UART_HandleTypeDef huart4 = {
+    .Instance = UART4,
+    .Init = {
+        .BaudRate = 115200,
+        .WordLength = UART_WORDLENGTH_8B,
+        .StopBits = UART_STOPBITS_1,
+        .Parity = UART_PARITY_NONE,
+        .Mode = UART_MODE_TX_RX,
+        .HwFlowCtl = UART_HWCONTROL_NONE,
+        .OverSampling = UART_OVERSAMPLING_16,
+		  },
+};
+
+DMA_HandleTypeDef hdma_uart4_tx = {
+    .Instance = DMA1_Stream4,
+    .Init = {
+        .Channel = DMA_CHANNEL_4,
+        .Direction = DMA_MEMORY_TO_PERIPH,
+        .PeriphInc = DMA_PINC_DISABLE,
+        .MemInc = DMA_MINC_ENABLE,
+        .PeriphDataAlignment = DMA_PDATAALIGN_BYTE,
+        .MemDataAlignment = DMA_MDATAALIGN_BYTE,
+        .Mode = DMA_NORMAL,
+        .Priority = DMA_PRIORITY_LOW,
+        .FIFOMode = DMA_FIFOMODE_DISABLE,
+    },
+};
+
+DMA_HandleTypeDef hdma_uart4_rx = {
+    .Instance = DMA1_Stream2,
+    .Init = {
+        .Channel = DMA_CHANNEL_4,
+        .Direction = DMA_PERIPH_TO_MEMORY,
+        .PeriphInc = DMA_PINC_DISABLE,
+        .MemInc = DMA_MINC_ENABLE,
+        .PeriphDataAlignment = DMA_PDATAALIGN_BYTE,
+        .MemDataAlignment = DMA_MDATAALIGN_BYTE,
+        .Mode = DMA_NORMAL,
+        .Priority = DMA_PRIORITY_LOW,
+        .FIFOMode = DMA_FIFOMODE_DISABLE,
+    },
+};
+
+UART_Config_t uart4_config = {
+    .handle = &huart4,
+    .dma_tx = &hdma_uart4_tx,
+    .dma_rx = &hdma_uart4_rx,
+};
+
 
 MAX7313_Config_t max7313_config = {
     .i2c_handle = &hi2c1,
@@ -152,6 +201,10 @@ MAX7313_Config_t max7313_config = {
     },
 };
 
+DISPLAY_Config_t display_config = {
+    .uart_config = &uart4_config,
+};
+
 void SystemClock_Config(void);
 void SteeringWheelMainTask(void *arg);
 
@@ -163,12 +216,12 @@ int main(void)
 
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_UART4_Init();
 
   SEGGER_SYSVIEW_Conf();
 
   configASSERT(CAN_Init(&hcan1) == HAL_OK);
   configASSERT(I2C_Init(&hi2c1) == HAL_OK);
+  configASSERT(UART4_Init(&uart4_config) == HAL_OK);
   configASSERT(USB_Init(&USB_Config) == HAL_OK);
 
   configASSERT(ADC_Init(&hadc1) == HAL_OK);
@@ -207,7 +260,7 @@ void SteeringWheelMainTask(void *arg)
   HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
 
   CAN_MESSAGES_Init(&hcan1);
-  configASSERT(DISPLAY_Init() == HAL_OK);
+  configASSERT(DISPLAY_Init(&display_config) == HAL_OK);
   configASSERT(RPM_LEDS_Init(&max7313_config) == HAL_OK);
   configASSERT(ADC_StartContinousConversion(&hadc1, 500) == HAL_OK);
 
