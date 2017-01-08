@@ -14,6 +14,9 @@
 #include "display.h"
 #include "dev_max7313.h"
 #include "rpm_leds.h"
+#include "vcp_forward.h"
+
+#define PROGRAM_MODE 0
 
 TaskHandle_t SteeringWheelMainTaskHandle;
 
@@ -203,6 +206,13 @@ MAX7313_Config_t max7313_config = {
 
 DISPLAY_Config_t display_config = {
     .uart_config = &uart4_config,
+    .current_menu = 0,
+    .menu_position = 0,
+};
+
+VCP_FORWARD_Config_t vcp_forward_config = {
+    .usb_config = &USB_Config,
+    .uart_config = &uart4_config,
 };
 
 void SystemClock_Config(void);
@@ -257,34 +267,49 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* handle)
 
 void SteeringWheelMainTask(void *arg)
 {
+  // enable 5v
   HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
 
+  // enable display
+  HAL_GPIO_WritePin(eDIP_Reset_GPIO_Port, eDIP_Reset_Pin, GPIO_PIN_SET);
+
+  vTaskDelay(100);
+
+#if PROGRAM_MODE == 0
   CAN_MESSAGES_Init(&hcan1);
-  configASSERT(DISPLAY_Init(&display_config) == HAL_OK);
   configASSERT(RPM_LEDS_Init(&max7313_config) == HAL_OK);
+  configASSERT(DISPLAY_Init(&display_config) == HAL_OK);
   configASSERT(ADC_StartContinousConversion(&hadc1, 500) == HAL_OK);
 
-  MAX7313_WritePort(&max7313_config, 0xFFFF);
+  uint8_t buffer = 0x00;
+  uint32_t bytes_read;
 
-  static CanTxMsgTypeDef TxMessage = {
-      .IDE = CAN_ID_STD,
-      .StdId = 0x200,
-      .DLC = 7,
-      .Data[0] = 0x01,
-      .Data[1] = 0x02,
-      .Data[2] = 0x03,
-      .Data[3] = 0x04,
-      .Data[4] = 0x05,
-      .Data[5] = 0x06,
-      .Data[6] = 0x07,
-  };
-
-  for(;;)
+  while(1)
   {
-    CAN_MESSAGES_Transmit(&hcan1, &TxMessage);
+    USB_VCP_readBlocking(&USB_Config, &buffer, sizeof(buffer), &bytes_read, portMAX_DELAY);
 
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    if(buffer == 'p')
+      DISPLAY_DATA_Buttons.plus = pdTRUE;
+
+    else if(buffer == 'm')
+      DISPLAY_DATA_Buttons.minus = pdTRUE;
+
+    else if(buffer == 'e')
+      DISPLAY_DATA_Buttons.enter = pdTRUE;
+
+    xEventGroupSetBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_BUTTON_PRESSED);
   }
+
+#else
+  configASSERT(VCP_FORWARD_Init(&vcp_forward_config) == HAL_OK);
+  vTaskDelay(1000);
+  VCP_FORWARD_Enable(&vcp_forward_config);
+
+  while (1)
+  {
+
+  }
+#endif
 }
 
 void SystemClock_Config(void)
