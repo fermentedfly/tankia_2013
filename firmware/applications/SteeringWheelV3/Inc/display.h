@@ -16,23 +16,36 @@
 
 #define DISPLAY_TIMEOUT 100
 
-#define DISPLAY_MAX_MENU_DEPTH 3
-
 typedef enum DISPLAY_MACRO
 {
-  // Init stuff
   DISPLAY_MACRO_Init = 0,
 
-  // Main Menu
-  DISPLAY_MACRO_Main = 10,
-  DISPLAY_MACRO_MainInv_1,
-  DISPLAY_MACRO_MainInv_2,
-  DISPLAY_MACRO_MainInv_3,
-  DISPLAY_MACRO_MainInv_4,
-  DISPLAY_MACRO_MainInv_5,
-  DISPLAY_MACRO_MainInv_6,
+  DISPLAY_MACRO_MenuInv_1,
+  DISPLAY_MACRO_MenuInv_2,
+  DISPLAY_MACRO_MenuInv_3,
+  DISPLAY_MACRO_MenuInv_4,
+  DISPLAY_MACRO_MenuInv_5,
+  DISPLAY_MACRO_MenuInv_6,
 
-  DISPLAY_MACRO_RacePage = 20,
+  DISPLAY_MACRO_PageInv_1 = 10,
+  DISPLAY_MACRO_PageInv_2,
+  DISPLAY_MACRO_PageInv_3,
+  DISPLAY_MACRO_PageInv_4,
+  DISPLAY_MACRO_PageInv_5,
+  DISPLAY_MACRO_PageInv_6,
+  DISPLAY_MACRO_PageInv_7,
+
+  DISPLAY_MACRO_PageValue_2,
+  DISPLAY_MACRO_PageValue_3,
+  DISPLAY_MACRO_PageValue_4,
+  DISPLAY_MACRO_PageValue_5,
+  DISPLAY_MACRO_PageValue_6,
+  DISPLAY_MACRO_PageValue_7,
+
+  // Main Menu
+  DISPLAY_MACRO_Main = 25,
+
+  DISPLAY_MACRO_RacePage = 30,
   DISPLAY_MACRO_Gear_1,
   DISPLAY_MACRO_Gear_2,
   DISPLAY_MACRO_Gear_3,
@@ -56,13 +69,9 @@ typedef enum DISPLAY_MACRO
   DISPLAY_MACRO_ACC_On,
   DISPLAY_MACRO_ACC_Off,
 
-  DISPLAY_MACRO_ECU = 50,
+  DISPLAY_MACRO_ECU = 60,
 
   DISPLAY_MACRO_ClutchSetup,
-  DISPLAY_MACRO_ClutchSetupInv1,
-  DISPLAY_MACRO_ClutchSetupInv2,
-  DISPLAY_MACRO_ClutchSetupInv3,
-  DISPLAY_MACRO_ClutchSetupInv4,
 
   DISPLAY_MACRO_ClutchCalibration = DISPLAY_MACRO_ClutchSetup + 5,
   DISPLAY_MACRO_ClutchNormal,
@@ -85,36 +94,27 @@ typedef enum DISPLAY_MACRO
 
   DISPLAY_MACRO_ClutchACC = DISPLAY_MACRO_ClutchNormal + 15,
 
-  DISPLAY_MACRO_Gear = 80,
-  DISPLAY_MACRO_GearInv_1,
-  DISPLAY_MACRO_GearInv_2,
-  DISPLAY_MACRO_GearInv_3,
-  DISPLAY_MACRO_GearControl,
+  DISPLAY_MACRO_Gear = 90,
+
+  DISPLAY_MACRO_GearControl = DISPLAY_MACRO_Gear + 4,
   DISPLAY_MACRO_GearACC,
 
-  DISPLAY_MACRO_Power = 90,
-  DISPLAY_MACRO_PowerInv_1,
-  DISPLAY_MACRO_PowerInv_2,
-  DISPLAY_MACRO_PowerInv_3,
-  DISPLAY_MACRO_PowerFanSetup,
+  DISPLAY_MACRO_Power = 100,
+  DISPLAY_MACRO_PowerFanSetup = DISPLAY_MACRO_Power + 4,
   DISPLAY_MACRO_PowerLVPD,
 
-  DISPLAY_MACRO_Diagnose = 100,
-  DISPLAY_MACRO_DiagnoseInv_1,
-  DISPLAY_MACRO_DiagnoseInv_2,
-  DISPLAY_MACRO_DiagnoseInv_3,
-  DISPLAY_MACRO_DiagnoseInv_4,
-  DISPLAY_MACRO_DiagnoseInv_5,
-  DISPLAY_MACRO_DiagnoseInv_6,
+  DISPLAY_MACRO_Diagnose = 110,
 
-  DISPLAY_MACRO_DiagnoseTireTemp,
+  DISPLAY_MACRO_DiagnoseTireTemp = DISPLAY_MACRO_Diagnose + 7,
   DISPLAY_MACRO_DiagnoseCarStates,
   DISPLAY_MACRO_DiagnoseTireStates,
   DISPLAY_MACRO_DiagnoseBCM,
-
-  DISPLAY_MACRO_Settings = 120,
+  DISPLAY_MACRO_DiagnoseSettings,
 
 } DISPLAY_MACRO_t;
+
+#define DISPLAY_MENU_MAIN_NR_ENTRIES 6
+#define DISPLAY_MENU_CLUTCH_NR_ENTRIES 4
 
 typedef enum DISPLAY_NEW_DATA_EVENT
 {
@@ -130,12 +130,13 @@ typedef enum DISPLAY_NEW_DATA_EVENT
 
 } DISPLAY_NEW_DATA_EVENT_t;
 
-#define DISPLAY_EVENT_NEW_DATA_ALL (DISPLAY_EVENT_UPDATE |\
-                                    DISPLAY_EVENT_NEW_DATA_RACEPAGE |\
-                                    DISPLAY_EVENT_NEW_DATA_GEAR_CONTROL |\
-                                    DISPLAY_EVENT_NEW_DATA_GEAR_ACC |\
-                                    DISPLAY_EVENT_NEW_DATA_CLUTCH_NORMAL |\
-                                    DISPLAY_EVENT_NEW_DATA_CLUTCH_ACC\
+#define DISPLAY_EVENT_ALL  (DISPLAY_EVENT_UPDATE |\
+                            DISPLAY_EVENT_BUTTON_PRESSED |\
+                            DISPLAY_EVENT_NEW_DATA_RACEPAGE |\
+                            DISPLAY_EVENT_NEW_DATA_GEAR_CONTROL |\
+                            DISPLAY_EVENT_NEW_DATA_GEAR_ACC |\
+                            DISPLAY_EVENT_NEW_DATA_CLUTCH_NORMAL |\
+                            DISPLAY_EVENT_NEW_DATA_CLUTCH_ACC\
                                     )
 
 typedef struct DISPLAY_Clutch_Normal
@@ -219,7 +220,8 @@ typedef struct DISPLAY_Config
 
   uint8_t menu_position;
   uint8_t current_menu;
-  uint8_t in_menu;
+
+  uint8_t edit_mode;
 
 } DISPLAY_Config_t;
 

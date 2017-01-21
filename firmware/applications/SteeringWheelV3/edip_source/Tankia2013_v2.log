@@ -1,0 +1,238 @@
+Macro-Compiler V3.4 (07.05.2013) for
+EA eDIPTFT32-A, EA eDIPTFT43-A, EA eDIPTFT57-A and EA eDIPTFT70-A
+
+Open File <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Tankia2013_v2.kmc>
+Open File <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\default_constant.kmi>
+Open File <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\default_font.kmi>
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\4x6.FXT>
+            size: 4x6 dots, used codes: 32..158, 1662 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\6x8.FXT>
+            size: 6x8 dots, used codes: 32..255, 3222 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\7x12.FXT>
+            size: 7x12 dots, used codes: 32..255, 3926 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\GENEVA10.FXT>
+            height: 10 dots, used codes: 32..248, 3108 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\CHICAG14.FXT>
+            height: 14 dots, used codes: 32..248, 3830 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\SWISS30B.FXT>
+            height: 30 dots, used codes: 32..248, 10470 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\BIGZIF50.FXT>
+            height: 50 dots, used codes: 43..58, 3186 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\BIGZIF100.FXT>
+            height: 100 dots, used codes: 43..58, 10809 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\16x32.FXT>
+            size: 16x32 dots, used codes: 32..127, 6934 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\Arial72.FXT>
+            size: 65x72 dots, used codes: 48..57, 6409 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\SWISS40.FXT>
+            height: 40 dots, used codes: 32..127, 11530 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\BIGZIF57.FXT>
+            height: 57 dots, used codes: 43..58, 3606 bytes
+Import Font <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Fonts\16X32 - Copy.FXT>
+            size: 58x69 dots, used codes: 78..78, 582 bytes
+Open File <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\default_border.kmi>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border01.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border02.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border03.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border04.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border05.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border06.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border07.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border08.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border09.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border10.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border11.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border12.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border13.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border14.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border15.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border16.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border17.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border18.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border19.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\border20.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\Register_Normal.bmp>
+              <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\Register_Selected.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\3Dgrey_Normal.bmp>
+              <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\3Dgrey_Selected.bmp>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\Bar3Dgrey.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\Bar3Dblue.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\Bar3Dred.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\Bar3Dgreen.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\Bar3Dmagenta.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\Bar3Dcyan.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\Bar3Dyellow.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarRoundGrey.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarRoundBlue.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarRoundRed.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarRoundGreen.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarRoundMagenta.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarRoundCyan.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarRoundYellow.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarRoundDarkRed.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarArrowGrey.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarArrowBlue.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarArrowRed.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarArrowGreen.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarArrowMagenta.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarArrowCyan.G16>
+Import Border <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\border\BarArrowYellow.G16>
+PowerOnMacro:   0,   3 commands,    12 bytes
+ResetMacro:   1,   1 commands,     4 bytes
+WatchdogMacro:   2,   1 commands,     4 bytes
+BrownOutMacro:   3,   1 commands,     4 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\TUGracing.jpg>
+               change colordepth 24-bit -> 16-bit with dithering
+               size: 240x49 dots, colordepth: 16-bit, 19511 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\TC_ON.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 8 colors are used: change colordepth->4-bit
+               size: 35x35 dots, colordepth: 4-bit, 493 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\TC_OFF.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 8 colors are used: change colordepth->4-bit
+               size: 35x35 dots, colordepth: 4-bit, 494 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\CAN_OK.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 12 colors are used: change colordepth->4-bit
+               size: 35x35 dots, colordepth: 4-bit, 594 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\CAN_NOK.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 12 colors are used: change colordepth->4-bit
+               size: 35x35 dots, colordepth: 4-bit, 594 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\ACC_ON.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 60 colors are used: change colordepth->8-bit
+               size: 40x70 dots, colordepth: 8-bit, 1701 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\ACC_OFF.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 2 colors are used: change colordepth->1-bit
+               used colors: RGB[0]=0,0,0  RGB[1]=16,16,16
+               size: 40x70 dots, colordepth: 1-bit, 180 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\Bat_OK.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 4 colors are used: change colordepth->4-bit
+               size: 60x70 dots, colordepth: 4-bit, 754 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\Bat_NOK.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 4 colors are used: change colordepth->4-bit
+               size: 60x70 dots, colordepth: 4-bit, 754 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\Oil_OK.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 40 colors are used: change colordepth->8-bit
+               size: 60x70 dots, colordepth: 8-bit, 1184 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\Oil_NOK.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 40 colors are used: change colordepth->8-bit
+               size: 60x70 dots, colordepth: 8-bit, 1184 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\arrow_right.jpg>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 23 colors are used: change colordepth->8-bit
+               size: 42x25 dots, colordepth: 8-bit, 784 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\arrow_left.jpg>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 19 colors are used: change colordepth->8-bit
+               size: 42x25 dots, colordepth: 8-bit, 651 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\Tankia2013.bmp>
+               change colordepth 24-bit -> 16-bit with dithering
+               only 46 colors are used: change colordepth->8-bit
+               size: 105x189 dots, colordepth: 8-bit, 15092 bytes
+Import Picture <D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\PICS\temp_bad.jpg>
+               change colordepth 24-bit -> 16-bit with dithering
+               size: 100x101 dots, colordepth: 16-bit, 8240 bytes
+Macro:   0,   8 commands,    31 bytes
+Macro:   1,   1 commands,    11 bytes
+Macro:   2,   1 commands,    11 bytes
+Macro:   3,   1 commands,    11 bytes
+Macro:   4,   1 commands,    11 bytes
+Macro:   5,   1 commands,    11 bytes
+Macro:   6,   1 commands,    11 bytes
+Macro:  10,   1 commands,    11 bytes
+Macro:  11,   1 commands,    11 bytes
+Macro:  12,   1 commands,    11 bytes
+Macro:  13,   1 commands,    11 bytes
+Macro:  14,   1 commands,    11 bytes
+Macro:  15,   1 commands,    11 bytes
+Macro:  16,   1 commands,    11 bytes
+Macro: 200,  10 commands,    55 bytes
+Macro:  25,  19 commands,   265 bytes
+Macro:  30,  51 commands,   368 bytes
+Macro:  42,  11 commands,    58 bytes
+Macro:  38,   1 commands,    11 bytes
+Macro:  39,   1 commands,    11 bytes
+Macro:  40,   1 commands,    11 bytes
+Macro:  37,   7 commands,    42 bytes
+Macro:  31,   7 commands,    42 bytes
+Macro:  32,   7 commands,    42 bytes
+Macro:  33,   7 commands,    42 bytes
+Macro:  34,   7 commands,    42 bytes
+Macro:  41,   1 commands,     8 bytes
+Macro:  47,   1 commands,     8 bytes
+Macro:  49,   1 commands,     8 bytes
+Macro:  50,   1 commands,     8 bytes
+Macro:  48,   1 commands,     8 bytes
+Macro:  45,   1 commands,     8 bytes
+Macro:  46,   1 commands,     8 bytes
+Macro:  51,   1 commands,     8 bytes
+Macro:  52,   1 commands,     8 bytes
+Macro:  43,   1 commands,     8 bytes
+Macro:  44,   1 commands,     8 bytes
+Macro:  60,  18 commands,   266 bytes
+Macro:  61,  15 commands,   176 bytes
+Macro:  66,  31 commands,   362 bytes
+Macro:  67,  20 commands,   278 bytes
+Macro:  68,   5 commands,    44 bytes
+Macro:  73,   6 commands,    49 bytes
+Macro:  69,   1 commands,    11 bytes
+Macro:  70,   1 commands,    11 bytes
+Macro:  71,   1 commands,    11 bytes
+Macro:  72,   1 commands,    11 bytes
+Macro:  74,   1 commands,    11 bytes
+Macro:  75,   1 commands,    11 bytes
+Macro:  76,   1 commands,    11 bytes
+Macro:  77,   1 commands,    11 bytes
+Macro:  78,   1 commands,    11 bytes
+Macro:  79,   1 commands,    11 bytes
+Macro:  80,   1 commands,    11 bytes
+Macro:  81,   1 commands,    11 bytes
+Macro:  82,  27 commands,   374 bytes
+Macro:  90,  13 commands,   135 bytes
+Macro:  94,  23 commands,   313 bytes
+Macro:  95,  23 commands,   317 bytes
+Macro: 100,  12 commands,   135 bytes
+Macro: 104,  18 commands,   244 bytes
+Macro: 105,  23 commands,   323 bytes
+Macro: 110,  18 commands,   258 bytes
+Macro: 117,  33 commands,   483 bytes
+Macro: 118,  22 commands,   298 bytes
+Macro: 119,  19 commands,   258 bytes
+Macro: 121,  21 commands,   312 bytes
+Macro: 120,  17 commands,   259 bytes
+
+Write DATA-FLASH Upload File D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Tankia2013_v2.DF
+
+DATA-FLASH Memory overview:
+     System:          3237 bytes
+   0 Strings:            0 bytes
+  13 Fonts:          69274 bytes
+   0 Pattern:            0 bytes
+  44 Border:         27268 bytes
+   0 Buttons:            0 bytes
+  15 Pictures:       52210 bytes
+   0 Animations:         0 bytes
+   0 Instruments:        0 bytes
+  68 Macros:          6267 bytes
+   0 Touchmacros:        0 bytes
+   0 Portmacros:         0 bytes
+   0 Bitmacros:          0 bytes
+   0 Matrixmacros:       0 bytes
+   0 Analogmacros:       0 bytes
+   0 Processmacros:      0 bytes
+ -------------------------------
+            sumary: 158256 bytes
+
+connecting eDIPTFT32-A on COM3
+found: eDIPTFT32-A 320x240, color, Smallprotokoll, 4128kB FLASH, 230400 baud
+program file D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Tankia2013_v2.DF with 115200 baud
+Ok
+Ready: eDIP is programed,  158256 bytes used, 4068816 bytes free

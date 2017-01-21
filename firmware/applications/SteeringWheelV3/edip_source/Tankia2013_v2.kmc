@@ -1,0 +1,1014 @@
+eDIPTFT32-A "Tankia 2013" ; Projectname" max. 32 character
+
+
+AutoScan: 1 			; autoscan for correct baud rate to connect to eDIP on COM/USB
+
+COM3: 115200				; program eDIP on COMx with 115200 Baud
+;USB: 230400, "eDIP Programmer"	; use EA 9777-USB eDIP Programmer and program eDIP with 230400 baud
+
+;VERIFY				; verify after program
+;------------------------------------------------------------------------------
+; load defaults
+
+include <default_constant.kmi>	; double click to open
+include <default_font.kmi>
+;include <default_pattern.kmi>
+include <default_border.kmi>
+
+;-------------------------------------------------------------------------------
+
+;-----Macros----
+MnInit = 0
+
+MnMenuInv_1 = MnInit + 1
+MnMenuInv_2 = MnInit + 2
+MnMenuInv_3 = MnInit + 3
+MnMenuInv_4 = MnInit + 4
+MnMenuInv_5 = MnInit + 5
+MnMenuInv_6 = MnInit + 6
+
+MnPageInv_1 = 10
+MnPageInv_2 = MnPageInv_1 + 1
+MnPageInv_3 = MnPageInv_1 + 2
+MnPageInv_4 = MnPageInv_1 + 3
+MnPageInv_5 = MnPageInv_1 + 4
+MnPageInv_6 = MnPageInv_1 + 5
+MnPageInv_7 = MnPageInv_1 + 6
+
+MnPageValue_2 = MnPageInv_1 + 8
+MnPageValue_3 = MnPageInv_1 + 9
+MnPageValue_4 = MnPageInv_1 + 10
+MnPageValue_5 = MnPageInv_1 + 11
+MnPageValue_6 = MnPageInv_1 + 12
+MnPageValue_7 = MnPageInv_1 + 13
+
+MnMain = 25
+
+MnRacePage = 30
+
+MnGear1 = MnRacePage + 1
+MnGear2 = MnRacePage + 2
+MnGear3 = MnRacePage + 3
+MnGear4 = MnRacePage + 4
+MnGear5 = MnRacePage + 5
+MnGear6 = MnRacePage + 6
+MnGearN = MnRacePage + 7
+MnInvTC = MnRacePage + 8
+MnInvBKB = MnRacePage + 9
+MnInvMP = MnRacePage + 10
+MnWarnTemp = MnRacePage + 11
+MnACC = MnRacePage + 12
+MnOilOk = MnRacePage + 13
+MnOilNok = MnRacePage + 14
+MnBatOk = MnRacePage + 15
+MnBatNOk = MnRacePage + 16
+MnTcOn = MnRacePage + 17
+MnTcOff = MnRacePage + 18
+MnCanOk = MnRacePage + 19
+MnCanNOk = MnRacePage + 20
+MnAccOn = MnRacePage + 21
+MnAccOff = MnRacePage + 22
+
+MnECU = 60
+
+MnClutchSetup = MnECU + 1
+
+MnClutchCalibration = MnClutchSetup + 5
+
+MnClutchNormal = MnClutchCalibration + 1
+
+Clutch_Normal_inv_1 = MnClutchNormal + 1
+Clutch_Normal_inv_2 = MnClutchNormal + 2
+Clutch_Normal_inv_3 = MnClutchNormal + 3
+Clutch_Normal_inv_4 = MnClutchNormal + 4
+Clutch_Normal_inv_5 = MnClutchNormal + 5
+Clutch_Normal_inv_6 = MnClutchNormal + 6
+Clutch_Normal_inv_7 = MnClutchNormal + 7
+Clutch_Normal_inv_8 = MnClutchNormal + 8
+
+Clutch_Normal_inv_12 = MnClutchNormal + 9
+Clutch_Normal_inv_13 = MnClutchNormal + 10 
+Clutch_Normal_inv_14 = MnClutchNormal + 11
+Clutch_Normal_inv_15 = MnClutchNormal + 12
+Clutch_Normal_inv_17 = MnClutchNormal + 13
+Clutch_Normal_inv_18 = MnClutchNormal + 14
+
+MnClutchACC = MnClutchNormal + 15
+
+MnGear = 90
+MnGearControl = MnGear + 4
+MnGearACC = MnGear + 5
+
+MnPower = 100
+MnPowerFanSetup = MnPower + 4
+MnPowerLVPD = MnPower + 5
+
+MnDiagnose = 110
+
+MnDiagnoseTireTemp = MnDiagnose + 7
+MnDiagnoseCarStates = MnDiagnose + 8
+MnDiagnoseTireStates = MnDiagnose + 9
+MnDiagnoseBCMDiagnose = MnDiagnose + 10
+MnDiagnoseSettings = MnDiagnose + 11
+
+MnHeader = 200
+
+;----Bargraphs----
+BgWater = 1
+BgOil = 2
+BgTPSRace = 3
+BgTPSECU = 4
+BgClutch = 5
+BgRPM = 6
+
+PowerOnMacro:		; runs after power-on
+	#TA			;Terminal aus
+	#FD 1,1		;foreground = black, background = black
+	#MN MnInit
+
+ResetMacro:		; runs after external reset
+	#MN MnInit
+
+WatchdogMacro:	; runs after a crash (>500ms)
+	#MN MnInit
+
+BrownOutMacro:	; runs when supply voltage drops <3V
+	#MN MnInit
+
+;-------------------------------------------------------------------------------
+Picture 1 <PICS\TUGracing.jpg>	; double click to open
+Picture 4 <PICS\TC_ON.bmp>
+Picture 5 <PICS\TC_OFF.bmp>
+Picture 6 <PICS\CAN_OK.bmp>
+Picture 7 <PICS\CAN_NOK.bmp>
+Picture 8 <PICS\ACC_ON.bmp>
+Picture 9 <PICS\ACC_OFF.bmp>
+Picture 10 <PICS\Bat_OK.bmp>
+Picture 11 <PICS\Bat_NOK.bmp>
+Picture 12 <PICS\Oil_OK.bmp>
+Picture 13 <PICS\Oil_NOK.bmp>
+Picture 14 <PICS\arrow_right.jpg>
+Picture 15 <PICS\arrow_left.jpg>
+Picture 16 <PICS\Tankia2013.bmp>
+Picture 17 <PICS\temp_bad.jpg>
+
+;-------------------------------------------------------------------------------
+Macro: MnInit
+
+;---- Place ELECTRONIC ASSEMBLY Logo ----
+	#TC 0				; Cursor invisible
+	#DL
+
+	#ZF GENEVA10		;Text Font
+	#ZZ 1,1		;Text Zoom 1x
+	#ZW 1			;Textausgabe: 90°
+	#UW 1			;Bilddarstellung: 90°	
+
+	#DL
+
+	#MN MnRacePage	;goto Race Page
+
+Macro MnMenuInv_1
+	#RI 89,10,119,230
+
+Macro MnMenuInv_2
+	#RI 129,10,159,230
+
+Macro MnMenuInv_3
+	#RI 169,10,199,230
+
+Macro MnMenuInv_4
+	#RI 209,10,239,230
+
+Macro MnMenuInv_5
+	#RI 249,10,279,230
+
+Macro MnMenuInv_6
+	#RI 289,10,319,230
+
+Macro MnPageInv_1
+	#RI 89,10,119,230
+
+Macro MnPageInv_2
+	#RI 140,95,160,225
+
+Macro MnPageInv_3
+	#RI 170,95,190,225
+
+Macro MnPageInv_4
+	#RI 200,95,220,225
+
+Macro MnPageInv_5
+	#RI 230,95,250,225
+
+Macro MnPageInv_6
+	#RI 260,95,280,225
+
+Macro MnPageInv_7
+	#RI 290,95,310,225
+
+Macro MnHeader
+	#TC 0				; Cursor invisible
+	#DL				;Delete Screen
+
+	#ZW 1				;Textausgabe: 90°
+	#UW 1				;Bilddarstellung: 90°	
+
+	#UI 0,0,1			;place Picture no. 1
+
+	#ZZ 1,1			;Set X,Y, Zoom
+
+	#FG WHITE, BLACK		;Set Line Color and Background Color		
+	#GD 80,0,80,240		;Draw Line from xxx to xxx
+
+	#FR WHITE,WHITE,BLACK	;Set Frame outer-, inner- and filling Color 
+	#RE 12,0			;Set Frame Type to 12, No Rotation
+
+Macro: MnMain
+	
+	#MN MnHeader
+
+	#ZF 6			
+	#FZ WHITE, BLACK	
+	#ZB 50,0,90,240,5,"Main Menu"		
+
+	#ZF 5			
+	#FZ WHITE, TRANSPARENT
+
+	#RR 89,10,119,230			
+	#ZB 89,10,119,230,5,"Race Page"	
+	#RR 129,10,159,230		
+	#ZB 129,10,159,230,5,"ECU - Data"
+	#RR 169,10,199,230
+	#ZB 169,10,199,230,5,"Clutch Setup"
+	#RR 209,10,239,230
+	#ZB 209,10,239,230,5,"Gear Setup"
+	#RR 249,10,279,230
+	#ZB 249,10,279,230,5,"Power Setup"
+	#RR 289,10,319,230
+	#ZB 289,10,319,230,5,"Diagnose and Settings"
+
+	#MN MnMenuInv_1
+	
+macro: MnRacePage
+	#TC 0				; Cursor invisible
+	#DL			;Delete Screen
+	#ZW 1			;Textausgabe: 90°
+	#UW 1			;Bilddarstellung: 90°
+
+	#FR WHITE,WHITE,WHITE
+
+	#ZF 5				;Set Font 5
+	#FZ WHITE, TRANSPARENT 	;Set Text Color and Background Color
+	#ZZ 2,2
+
+	#RE 12,0
+	#RR 0,0,30,240
+
+	#FR WHITE,WHITE,BLACK
+	#ZF 5				;Set Font 5
+	#ZZ 1,1
+	#FZ WHITE, TRANSPARENT 	;Set Text Color and Background Color	
+
+	#RE 2,0
+	#RR 280,0,310,80
+	#ZB 282,40,310,80,5,"MP:"
+
+	#RR 280,80,310,160
+	#ZB 282,120,310,160,5,"BKB:"
+
+	#RR 280,160,310,240
+	#ZB 282,200,310,240,5,"TC:"
+
+
+	#FR WHITE,BLACK,WHITE
+	#ZF 13			;Set Font 
+	#FZ GREEN, WHITE 	;Set Text Color and Background Color
+	#ZZ 1,1
+
+	#RE 17,0
+	#RR 35,40,165,200
+
+	#ZF 5				;Set Font 5
+	#FZ BLACK, TRANSPARENT 	;Set Text Color and Background Color
+	#ZZ 1,1
+
+	#RE 12,0
+	#RR 240,0,275,240
+	#ZB 241,160,275,240,5,"KMH:"
+
+	#ZF 5
+	#ZZ 1,1
+
+
+	#ZF 5
+	#ZZ 1,1
+
+	;Bargraphs
+	#ZF 5				;Set Font 5
+	#FZ BLACK, TRANSPARENT 	;Set Text Color and Background Color
+	#ZZ 1,1
+
+	#BM 0					; set fill pattern for bargraph (none)
+	#FB GREEN,BLACK,WHITE			; set colour for bargraph pattern, background and frame
+						; same as "#FB 4,1,8
+	#BE 118				; set the bargraph frame type
+	#BL BgWater,175,28,35,12,0,110,5		; define bargraph no. 1 with size, value and type
+
+	#BL BgOil,175,228,35,212,0,140,5	; define bargraph no. 1 with size, value and type
+
+	#FZ WHITE, TRANSPARENT 	;Set Text Color and Background Color
+	#ZB 170,203,200,240,5,"Oil"
+	#ZB 170,0,200,40,5,"Wtr"
+
+	#ZF 5				;Set Font 5
+	#ZZ 1,1
+	#FZ WHITE, TRANSPARENT 	;Set Text Color and Background Color
+
+
+macro: MnACC
+	#TC 0				; Cursor invisible
+
+	#DL			;Delete Screen
+
+	#ZW 1			;Textausgabe: 90°
+	#UW 1			;Bilddarstellung: 90°
+
+	#ZF 5				;Set Font 5
+	#FZ BLACK, TRANSPARENT 	;Set Text Color and Background Color
+	#ZZ 1,1
+
+	#BM 0						; set fill pattern for bargraph (none)
+	#FB GREEN,BLACK,WHITE			; set colour for bargraph pattern, background and frame
+							; same as "#FB 4,1,8
+	#BE 118					; set the bargraph frame type
+	#BU BgRPM,320,240,0,0,0,254,7		; define bargraph no. 1 with size, value and type
+
+macro: MnInvTC
+	#RI 282,164,304,235
+
+macro: MnInvBKB
+	#RI 282,84,304,156
+
+macro: MnInvMP
+	#RI 282,4,304,76	
+
+macro: MnGearN
+	#ZF 13			;Set Font 
+	#FZ GREEN, WHITE 	;Set Text Color and Background Color
+	#ZZ 1,1
+
+	#ZB 40,64,134,175,8,"N"
+
+	#ZF 5				;Set Font 5
+	#ZZ 1,1
+	#FZ BLACK, WHITE 	;Set Text Color and Background Color
+
+macro: MnGear1
+	#ZF 10			;Set Font 
+	#FZ RED, WHITE 	;Set Text Color and Background Color
+	#ZZ 1,1
+
+	#ZB 40,64,134,175,8,"1"
+
+	#ZF 5				;Set Font 5
+	#ZZ 1,1
+	#FZ BLACK, WHITE 	;Set Text Color and Background Color
+
+macro: MnGear2
+	#ZF 10			;Set Font 
+	#FZ RED, WHITE 	;Set Text Color and Background Color
+	#ZZ 1,1
+
+	#ZB 40,64,134,175,8,"2"
+
+	#ZF 5				;Set Font 5
+	#ZZ 1,1
+	#FZ BLACK, WHITE 	;Set Text Color and Background Color
+
+macro: MnGear3
+	#ZF 10			;Set Font 
+	#FZ RED, WHITE 	;Set Text Color and Background Color
+	#ZZ 1,1
+
+	#ZB 40,64,134,175,8,"3"
+
+	#ZF 5				;Set Font 5
+	#ZZ 1,1
+	#FZ BLACK, WHITE 	;Set Text Color and Background Color
+
+macro: MnGear4
+	#ZF 10			;Set Font 
+	#FZ RED, WHITE 	;Set Text Color and Background Color
+	#ZZ 1,1
+
+	#ZB 40,64,134,175,8,"4"
+
+	#ZF 5				;Set Font 5
+	#ZZ 1,1
+	#FZ BLACK, WHITE 	;Set Text Color and Background Color
+
+macro: MnWarnTemp
+	#UI 38,68,17	;place Picture no. 17
+
+macro: MnTcOn
+	#UI 203,204,4		;place Picture no. 4
+
+macro: MnCanOk
+	#UI 203,1,6		;place Picture no. 6
+
+macro: MnCanNOk
+	#UI 203,1,7		;place Picture no. 7
+
+macro: MnTcOff
+	#UI 203,204,5		;place Picture no. 5
+
+macro: MnBatOk
+	#UI 168,38,10		;place Picture no. 10
+
+macro: MnBatNOk
+	#UI 168,38,11		;place Picture no. 11
+
+macro: MnAccOn
+	#UI 168,100,8		;place Picture no. 8
+
+macro: MnAccOff
+	#UI 168,100,9		;place Picture no. 9
+
+macro: MnOilOk
+	#UI 168,142,12		;place Picture no. 12
+
+macro: MnOilNOk
+	#UI 168,142,13		;place Picture no. 13
+
+macro: MnECU
+	#MN MnHeader
+
+	#ZF 6
+
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"ECU Data"
+	
+	#ZF 5
+	#FZ WHITE, TRANSPARENT
+
+	#RR 89,10,320,230
+
+	#ZB 95,120,115,230,6,"Water Temp. :"
+	#ZB 120,120,140,230,6,"Oil Temp. :"
+	#ZB 145,120,165,230,6,"Fuel Press. :"
+	#ZB 170,120,190,230,6,"Brake-P. F :"
+	#ZB 195,120,215,230,6,"Brake-P. R :"
+	#ZB 220,120,240,230,6,"RPM :"
+	#ZB 245,120,265,230,6,"Oil Press. :"
+	#ZB 270,120,290,230,6,"TPS :"
+
+	#BE 111
+	#FB GREEN,BLACK,WHITE
+	#BO BgTPSECU,290,25,305,215,0,100,5
+
+Macro: MnClutchSetup
+
+	#MN MnHeader
+
+	#ZF 6				
+
+	#FZ WHITE, BLACK		
+	#ZB 50,0,90,240,5,"Clutch Setup"	
+
+	#ZF 5					
+	#FZ WHITE, TRANSPARENT 			
+
+	#RR 89,10,119,230			
+	#ZB 89,10,119,230,5,"EXIT"	
+	#RR 129,10,159,230		
+	#ZB 129,10,159,230,5,"Calibration"
+	#RR 169,10,199,230
+	#ZB 169,10,199,230,5,"Normal"
+	#RR 209,10,239,230
+	#ZB 209,10,239,230,5,"ACC-Mode"
+
+	#MN MnMenuInv_1
+
+macro: MnClutchCalibration
+
+	#MN MnHeader
+
+	#ZF 6				
+	#FZ WHITE, BLACK		
+	#ZB 50,0,90,240,5,"Clutch Calib."	
+
+	#ZF 5				
+	#FZ WHITE, TRANSPARENT 	
+
+	#FR WHITE,WHITE,BLACK	
+	#RE 12,0			
+	
+	#RR 89,10,320,230		
+
+	#ZB 95,10,115,230,5,"Pedal Position"
+	
+	#BE 101
+	#FB GREEN,BLACK,WHITE			; set colour for bargraph pattern, background and frame
+	#BO BgClutch,115,25,135,215,0,100,5	; define bargraph no. 1 with size, value and type
+
+	#ZB 133,218,153,198,5,"0%"
+	#ZB 133,20,153,60,5,"100%"
+
+	#ZB 166,12,186,57,5,"CAN"
+	#ZB 166,230,186,185,5,"ADC"
+
+	#ZB 238,171,258,221,5,"Press"
+	#ZB 238,71,258,21,5,"Press"
+
+	#ZB 278,171,298,221,5,"to set"
+	#ZB 278,71,298,21,5,"to set"
+
+	#ZB 290,171,310,221,5,"MIN"
+	#ZB 290,71,310,21,5,"MAX"
+
+	#UI 256,174,15
+	#UI 256,24,14
+
+	#RE 2,0
+	#RR 160,125,190,185
+	#RR 160,115,190,55
+
+	#RE 1,0
+	#RR 262,167,287,122
+	#RR 262,118,287,73
+
+macro: MnClutchNormal
+
+	#MN MnHeader
+
+	#ZF 6					
+	#FZ WHITE, BLACK			
+	#ZB 50,0,90,240,5,"Clutch Normal"	
+
+	#ZF 5		
+	#FZ WHITE, TRANSPARENT 		
+
+	#RR 129,10,320,230		
+
+	#RR 89,10,119,230		
+	#ZB 89,10,119,230,5,"EXIT"	
+	#ZB 140,95,160,230,6,"Clutch Points:"
+	#ZB 170,95,190,230,6,"Clutch tolerance:"
+	#ZB 200,95,220,230,6,"C-Sensor Min:"
+	#ZB 230,95,250,230,6,"C-Sensor Max:"
+	
+	#RE 1,0
+	#FZ WHITE, TRANSPARENT 	
+	#ZB 141,43,157,78,8,"1000"
+	#ZB 171,43,187,78,8,"1000"
+	#ZB 201,43,217,78,8,"1000"
+	#ZB 231,43,247,78,8,"1000"
+
+	#MN MnPageInv_1
+
+macro: Clutch_Normal_inv_1:
+	#FR WHITE,BLACK,WHITE
+	#FZ BLACK,0
+	#RE 12,0
+	#RR 89,10,119,230
+	#ZB 89,10,119,230,5,"EXIT"
+
+macro: Clutch_Normal_inv_6:
+	#FR WHITE,WHITE,BLACK
+	#FZ WHITE, TRANSPARENT
+	#RE 12,0	
+
+	#RR 89,10,119,230	
+	#ZB 89,10,119,230,5,"EXIT"
+
+	#RE 1,0
+
+macro: Clutch_Normal_inv_2:
+	#RI 140,40,160,79     ;1. 
+	;#RR 138,38,162,81     ;2. 
+	;#ZB 141,43,157,78,8,"1000" ;3. 
+
+macro: Clutch_Normal_inv_3:
+	#RI 170,40,190,79     ;1. 
+	;#RR 168,38,192,81
+	;#ZB 171,43,187,78,8,"1000"
+
+macro: Clutch_Normal_inv_4:
+	#RI 200,40,220,79     ;1. 
+	;#RR 198,38,222,81
+	;#ZB 201,43,217,78,8,"1000"
+
+macro: Clutch_Normal_inv_5:
+	#RI 230,40,250,79     ;1.
+	;#RR 228,38,252,81
+	;#ZB 231,43,247,78,8,"1000"
+
+macro: Clutch_Normal_inv_7:
+	#RI 260,40,280,79     ;1.
+	;#RR 258,38,282,81
+	;#ZB 261,43,277,78,8,"1000"
+
+macro: Clutch_Normal_inv_8:
+	#RI 290,40,310,79     ;1.
+	;#RR 288,38,312,81
+	;#ZB 291,43,307,78,8,"1000"
+
+
+;zurück vom Rahmen zum markierten
+macro: Clutch_Normal_inv_12:
+	#RI 138,38,162,81     ;1. 
+
+macro: Clutch_Normal_inv_13:
+	#RI 168,38,192,81     ;1. 
+
+macro: Clutch_Normal_inv_14:
+	#RI 198,38,222,81     ;1. 
+
+macro: Clutch_Normal_inv_15:
+	#RI 228,38,252,81     ;1.
+
+macro: Clutch_Normal_inv_17:
+	#RI 258,38,282,81
+
+macro: Clutch_Normal_inv_18:
+	#RI 288,38,312,81
+
+
+
+macro: MnClutchACC
+
+	#MN MnHeader
+
+	#ZF 6				
+	#FZ WHITE, BLACK			
+	#ZB 50,0,90,240,5,"Clutch ACC"
+
+	#RR 129,10,320,230
+
+	#ZF 5	
+	#FZ WHITE, TRANSPARENT 
+
+	#RR 89,10,119,230			
+	#ZB 89,10,119,230,5,"EXIT"	
+	#ZB 140,95,160,230,6,"Switchpoint1:"
+	#ZB 170,95,190,230,6,"Switchpoint2:"
+	#ZB 200,95,220,230,6,"Curvegradient1:"
+	#ZB 230,95,250,230,6,"Curvegradient2:"
+	#ZB 260,95,280,230,6,"Curvegradient3:"
+	
+	#RE 1,0
+	#FZ WHITE, TRANSPARENT
+	#ZB 141,43,157,78,8,"0"
+	#ZB 171,43,187,78,8,"0"
+	#ZB 201,43,217,78,8,"0"
+	#ZB 231,43,247,78,8,"0"
+	#ZB 261,43,277,78,8,"0"
+
+	#ZB 141,13,157,48,8,"%"
+	#ZB 171,13,187,48,8,"%"
+	#ZB 201,13,217,48,8,"%"
+	#ZB 231,13,247,48,8,"%"
+	#ZB 261,13,277,48,8,"%"
+
+	#MN MnMenuInv_1
+
+macro: MnGear
+
+	#MN MnHeader
+
+	#ZF 6	
+	#FZ WHITE, BLACK			
+	#ZB 50,0,90,240,5,"Gear Setup"
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT
+
+	#RR 89,10,119,230			
+	#ZB 89,10,119,230,5,"EXIT"	
+	#RR 129,10,159,230		
+	#ZB 129,10,159,230,5,"Control"
+	#RR 169,10,199,230
+	#ZB 169,10,199,230,5,"ACC"
+
+	#Mn MnMenuInv_1
+
+macro: MnGearControl
+	#MN MnHeader
+
+	#ZF 6			
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"Gear Control"
+
+	#ZF 5	
+	#FZ WHITE, TRANSPARENT
+
+	#RR 129,10,320,230
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT
+
+	#RR 89,10,119,230
+	#ZB 89,10,119,230,5,"EXIT"
+	#ZB 140,95,160,230,6,"Shifts Done:"
+	#ZB 170,95,190,230,6,"Min Shift Delay:"
+	#ZB 200,95,220,230,6,"Shift UP HoldT:"
+	#ZB 230,95,250,230,6,"Shift DN HoldT:"
+       #ZB 260,95,280,230,6,"Shift  N HoldT:"
+	
+	#RE 1,0
+	#FZ WHITE, TRANSPARENT	
+	#ZB 141,43,157,78,8,"0"
+	#ZB 171,43,187,78,8,"0"
+	#ZB 201,43,217,78,8,"0"
+	#ZB 231,43,247,78,8,"0"
+	#ZB 260,43,280,78,8,"0"
+
+macro: MnGearACC
+	#MN MnHeader	
+
+	#ZF 6
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"Gear - ACC"
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT 
+
+	#RR 129,10,320,230
+
+	#ZF 5	
+	#FZ WHITE, TRANSPARENT
+
+	#RR 89,10,119,230
+	#ZB 89,10,119,230,5,"EXIT"
+	#ZB 140,95,160,230,6,"ACC Wheelslip:"
+	#ZB 170,95,190,230,6,"ACC Min Speed:"
+	#ZB 200,95,220,230,6,"ACC ShiftRPM1:"
+	#ZB 230,95,250,230,6,"ACC ShiftRPM2:"
+	#ZB 260,95,280,230,6,"ACC ShiftRPM3:"
+	
+	#RE 1,0
+	#ZB 141,43,157,78,8,"0"
+	#ZB 171,43,187,78,8,"0"
+	#ZB 201,43,217,78,8,"0"
+	#ZB 231,43,247,78,8,"0"
+	#ZB 261,43,277,78,8,"0"
+
+	#ZB 141,13,157,48,8,"%"
+
+macro: MnPower
+	#MN MnHeader
+
+	#ZF 6
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"Power Setup"
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT
+
+	#RR 89,10,119,230			
+	#ZB 89,10,119,230,5,"EXIT"		
+	#RR 129,10,159,230			
+	#ZB 129,10,159,230,5,"Fan Setup"
+	#RR 169,10,199,230
+	#ZB 169,10,199,230,5,"LVPD"
+
+macro: MnPowerFanSetup
+	#MN MnHeader
+
+	#ZF 6
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"Fan Setup"
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT
+
+	#RR 129,10,320,230
+
+	#RR 89,10,119,230
+	#ZB 89,10,119,230,5,"EXIT"
+	#ZB 140,95,160,230,6,"Fan OFF Temp:"
+	#ZB 170,95,190,230,6,"Fan ON Temp:"
+	#ZB 200,95,220,230,6,"Fan OFF RPM:"
+	#ZB 230,95,250,230,6,"Fan ON RPM:"
+	
+	#RE 1,0
+
+	#ZB 141,43,157,78,8,"0"
+	#ZB 171,43,187,78,8,"0"
+	#ZB 201,43,217,78,8,"0"
+	#ZB 231,43,247,78,8,"0"
+
+
+macro: MnPowerLVPD
+	#MN MnHeader
+	
+	#ZF 6
+
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"LVPD"
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT
+
+	#RR 129,10,320,230
+
+	#RR 89,10,119,230
+	#ZB 89,10,119,230,5,"EXIT"
+	#ZB 140,95,160,230,6,"Circuit nr.:"
+	#ZB 170,95,190,230,6,"Current:"
+	#ZB 200,95,220,230,6,"Status:"
+	#ZB 230,95,250,230,6,"Turn ON/OFF:"
+	#ZB 260,95,280,230,6,"Current max:"
+	#ZB 290,95,310,230,6,"System Voltage:"
+	
+	#RE 1,0
+	#FZ WHITE, TRANSPARENT	
+	#ZB 141,43,157,78,8,"0"
+	#ZB 171,43,187,78,8,"0 A"
+	#ZB 201,43,217,78,8,"OL"
+	#ZB 231,43,247,78,8,"0"
+	#ZB 261,43,277,78,8,"0 A"
+	#ZB 291,43,307,78,8,"0 V"
+
+macro: MnDiagnose
+	#MN MnHeader
+	
+	#ZF 6
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"Diag and Set."
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT 
+
+	#RR 89,10,119,230
+	#ZB 89,10,119,230,5,"EXIT"
+	#RR 129,10,159,230	
+	#ZB 129,10,159,230,5,"Tire Temperature"
+	#RR 169,10,199,230
+	#ZB 169,10,199,230,5,"Car Device States"
+	#RR 209,10,239,230
+	#ZB 209,10,239,230,5,"Tire Device States"
+	#RR 249,10,279,230
+	#ZB 249,10,279,230,5,"BCM"
+	#RR 289,10,319,230
+	#ZB 289,10,319,230,5,"Settings"
+
+
+macro: MnDiagnoseTireTemp
+	#MN MnHeader
+
+	#ZF 6
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"Tire Temperature"
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT
+
+	#RR 89,10,320,230
+
+	#UI 110,68,16	
+
+	#ZB 95,198,115,230,6,"To.:"	
+	#ZB 115,198,135,230,6,"Tm.:"
+	#ZB 135,198,155,230,6,"Ti.:"
+
+	#ZB 95,110,115,50,6,"To.:"
+	#ZB 115,110,135,50,6,"Tm.:"	
+	#ZB 135,110,155,50,6,"Ti.:"
+
+	#ZB 200,198,220,230,6,"To.:"
+	#ZB 220,198,240,230,6,"Tm.:"
+	#ZB 240,198,260,230,6,"Ti.:"
+
+	#ZB 200,110,220,50,6,"To.:"	
+	#ZB 220,110,240,50,6,"Tm.:"	
+	#ZB 240,110,260,50,6,"Ti.:"	
+
+	#FZ WHITE, BLACK	
+	#ZB 95,163,115,196,6,"111ø"
+	#ZB 115,163,135,196,6,"112ø"
+	#ZB 135,163,155,196,6,"113ø"
+
+	#ZB 95,15,115,40,6,"111ø"
+	#ZB 115,15,135,40,6,"111ø"
+	#ZB 135,15,155,40,6,"111ø"
+
+	#ZB 200,163,220,196,6,"111ø"
+	#ZB 220,163,240,196,6,"111ø"
+	#ZB 240,163,260,196,6,"111ø"
+
+	#ZB 200,15,220,40,6,"111ø"
+	#ZB 220,15,240,40,6,"111ø"
+	#ZB 240,15,260,40,6,"111ø"
+
+macro: MnDiagnoseCarStates
+	#MN MnHeader
+
+	#ZF 6
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"Car Device States"
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT 
+
+	#RR 129,10,320,230
+
+	#RR 89,10,119,230
+	#ZB 89,10,119,230,5,"EXIT"
+	#ZB 141,94,159,210,6,"ECU:"
+	#ZB 171,94,190,210,6,"BCM:"	
+	#ZB 201,94,220,210,6,"LVPD:"
+	#ZB 231,94,250,210,6,"CAN-Node F:"
+	#ZB 261,94,280,210,6,"CAN-Node R:"
+	#ZB 290,95,310,230,5,"Travel D.[km]:"
+
+	#RE 1,0
+	#FZ WHITE, TRANSPARENT	
+	#ZB 141,43,157,78,8,"0"
+	#ZB 171,43,187,78,8,"0"
+	#ZB 201,43,217,78,8,"0"
+	#ZB 231,43,247,78,8,"0"
+	#ZB 261,43,277,78,8,"0"
+
+macro: MnDiagnoseTireStates
+	#MN MnHeader
+
+	#ZF 6
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"Tire Device States"
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT
+
+	#RR 129,10,320,230
+
+	#RR 89,10,119,230
+	#ZB 89,10,119,230,5,"EXIT"
+	#ZB 140,95,160,230,6,"TireTemp FL:"
+	#ZB 170,95,190,230,6,"TireTemp FR:"
+	#ZB 200,95,220,230,6,"TireTemp RL:"
+	#ZB 230,95,250,230,6,"TireTemp RR:"
+	
+	#RE 1,0
+	#FZ WHITE, TRANSPARENT	
+	#ZB 141,43,157,78,8,"0"
+	#ZB 171,43,187,78,8,"0"
+	#ZB 201,43,217,78,8,"0"
+	#ZB 231,43,247,78,8,"0"
+
+macro: MnDiagnoseSettings
+	#MN MnHeader
+
+	#ZF 6
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"Settings"
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT
+
+	#RR 129,10,320,230
+
+	#RR 89,10,119,230
+	#ZB 89,10,119,230,5,"EXIT"
+	#ZB 140,80,160,235,6,"Splashscreen:"
+	#ZB 170,80,190,235,6,"LED Intensity:"
+	#ZB 200,80,220,235,6,"Display Intensity:"
+	#ZB 230,80,250,235,6,"Reset Brakebalance:"
+	#ZB 260,80,280,235,6,"Reset Steering Angle:"
+	
+	#RE 1,0
+	#FZ WHITE, TRANSPARENT 	;Set Text Color and Background Color	
+	#ZB 141,43,157,78,6,"0"
+	#ZB 171,43,187,78,6,"0"
+	#ZB 201,43,217,78,6,"0"
+	#ZB 231,43,247,78,6,"0"
+	#ZB 261,43,277,78,6,"0"
+
+macro: MnDiagnoseBCMDiagnose
+	#MN MnHeader	
+
+	#ZF 6
+
+	#FZ WHITE, BLACK
+	#ZB 50,0,90,240,5,"BCM Diagnose"
+
+	#ZF 5
+	#FZ WHITE, TRANSPARENT
+
+	#RR 129,10,320,230
+
+	#RR 89,10,119,230
+	#ZB 89,10,119,230,5,"EXIT"
+
+	#ZB 140,95,160,230,6,"Error Flags:"
+	#ZB 170,95,190,230,6,"Error Flags Space"
+	#ZB 200,95,220,230,6,"Intake length:"
+	#ZB 230,95,250,230,6,"Hours of Op.:"
+	#ZB 260,95,280,230,6,"Reset Op. Hours:"
+	#ZB 290,95,310,230,6,"Launch State:"
+	
+	#RE 1,0
+	#FZ WHITE, TRANSPARENT	
+
+

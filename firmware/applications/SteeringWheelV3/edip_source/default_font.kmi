@@ -1,0 +1,43 @@
+;------------------------------------------------------------------------------
+; default fonts
+
+FONT4x6   = 1
+FONT6x8   = 2
+FONT7x12  = 3
+GENEVA10  = 4
+CHICAGO14 = 5
+SWISS30B  = 6
+BIGZIF50  = 7
+BIGZIF100 = 8
+FONT16x32 = 9
+ARIAL72 = 10
+
+LogFontWidth:   0
+ExportOverview: 0
+
+Path: <Fonts>
+
+Font: FONT4x6,   <4x6.FXT>
+Font: FONT6x8,   <6x8.FXT>
+Font: FONT7x12,  <7x12.FXT>
+Font: GENEVA10,  <GENEVA10.FXT>
+Font: CHICAGO14, <CHICAG14.FXT>
+Font: SWISS30B,  <SWISS30B.FXT>
+Font: BIGZIF50,  <BIGZIF50.FXT>
+Font: BIGZIF100, <BIGZIF100.FXT>
+Font: FONT16x32, <16x32.FXT>
+Font: ARIAL72, <Arial72.FXT>
+Font: 11, <SWISS40.FXT>
+Font: 12, <BIGZIF57.FXT>
+Font: 13, <16X32 - Copy.FXT>
+
+
+
+;------------------------------------------------------------------------------
+; import TTF fonts
+
+ExportWinFont:  0
+ExportOverview: 0
+
+;WinFont: 9,  "Arial",0,0, 32,127, 48	; doubleclick 'fontname' to edit
+

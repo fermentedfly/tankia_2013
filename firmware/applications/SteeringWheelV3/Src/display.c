@@ -14,12 +14,83 @@ DISPLAY_BUTTON_t DISPLAY_DATA_Buttons;
 
 EventGroupHandle_t DISPLAY_NewDataEventHandle;
 
+static const uint8_t const DISPLAY_MenuMainSubAddress[] = {
+    DISPLAY_MACRO_RacePage,
+    DISPLAY_MACRO_ECU,
+    DISPLAY_MACRO_ClutchSetup,
+    DISPLAY_MACRO_Gear,
+    DISPLAY_MACRO_Power,
+    DISPLAY_MACRO_Diagnose
+};
+
+static const uint8_t const DISPLAY_MenuClutchSubAddress[] = {
+    DISPLAY_MACRO_Main,
+    DISPLAY_MACRO_ClutchCalibration,
+    DISPLAY_MACRO_ClutchNormal,
+    DISPLAY_MACRO_ClutchACC
+};
+
+static const uint8_t const DISPLAY_MenuGearSubAddress[] = {
+    DISPLAY_MACRO_Main,
+    DISPLAY_MACRO_GearControl,
+    DISPLAY_MACRO_GearACC,
+};
+
+static const uint8_t const DISPLAY_MenuPowerSubAddress[] = {
+    DISPLAY_MACRO_Main,
+    DISPLAY_MACRO_PowerFanSetup,
+    DISPLAY_MACRO_PowerLVPD,
+};
+
+static const uint8_t const DISPLAY_MenuDiagnoseAddress[] = {
+    DISPLAY_MACRO_Main,
+    DISPLAY_MACRO_DiagnoseTireTemp,
+    DISPLAY_MACRO_DiagnoseCarStates,
+    DISPLAY_MACRO_DiagnoseTireStates,
+    DISPLAY_MACRO_DiagnoseBCM,
+    DISPLAY_MACRO_DiagnoseSettings
+};
+
+static const uint8_t const DISPLAY_MenuECUAddress[] = {
+    DISPLAY_MACRO_Main,
+};
+
+static const uint8_t const DISPLAY_MenuClutchCalibrationAddress[] = {
+    DISPLAY_MACRO_ClutchSetup,
+};
+
+static const uint8_t const DISPLAY_MenuClutchNormalAddress[] = {
+    DISPLAY_MACRO_ClutchSetup,
+};
+
+static const uint8_t const * const DISPLAY_MenuMapper[] = {
+    [DISPLAY_MACRO_Main] = DISPLAY_MenuMainSubAddress,
+    [DISPLAY_MACRO_ClutchSetup] = DISPLAY_MenuClutchSubAddress,
+    [DISPLAY_MACRO_Gear] = DISPLAY_MenuGearSubAddress,
+    [DISPLAY_MACRO_Power] = DISPLAY_MenuPowerSubAddress,
+    [DISPLAY_MACRO_Diagnose] = DISPLAY_MenuDiagnoseAddress,
+
+    [DISPLAY_MACRO_ECU] = DISPLAY_MenuECUAddress,
+    [DISPLAY_MACRO_ClutchCalibration] = DISPLAY_MenuClutchCalibrationAddress,
+    [DISPLAY_MACRO_ClutchNormal] = DISPLAY_MenuClutchNormalAddress,
+};
+
+static const uint8_t const DISPLAY_MenuSize[] = {
+    [DISPLAY_MACRO_Main] = 6,
+    [DISPLAY_MACRO_ClutchSetup] = 4,
+    [DISPLAY_MACRO_Gear] = 3,
+    [DISPLAY_MACRO_Power] = 3,
+    [DISPLAY_MACRO_Diagnose] = 6,
+
+    [DISPLAY_MACRO_ClutchNormal] = 5,
+};
+
 static inline HAL_StatusTypeDef DISPLAY_SendCommand(DISPLAY_Config_t *config, uint8_t *message, uint32_t length, TickType_t timeout);
 static HAL_StatusTypeDef DISPLAY_CmdShowMacro(DISPLAY_Config_t *config, uint32_t macro_number, TickType_t timeout);
 static void DISPLAY_Task(void *arg);
 static void DISPLAY_Update(TimerHandle_t xTimer);
-static inline uint8_t DISPLAY_GetNumberOfMenuEntries(uint8_t menu_id);
-static inline uint8_t DISPLAY_GetSubMenuID(uint8_t current_menu, uint8_t cursor_position, uint8_t *is_menu);
+static inline void DISPLAY_ShowMenu(DISPLAY_Config_t *config, uint8_t menu, uint8_t position);
+static inline void DISPLAY_Navigate(DISPLAY_Config_t *config, uint8_t base_address, uint8_t plus, uint8_t minus, uint8_t nr_entries);
 
 HAL_StatusTypeDef DISPLAY_Init(DISPLAY_Config_t *config)
 {
@@ -37,61 +108,112 @@ static void DISPLAY_Task(void *arg)
   DISPLAY_Config_t *config = (DISPLAY_Config_t *)arg;
 
   // show main menu initially
-  DISPLAY_CmdShowMacro(config, DISPLAY_MACRO_Main, DISPLAY_TIMEOUT);
-  config->current_menu = DISPLAY_MACRO_Main;
-  config->in_menu = pdTRUE;
+  DISPLAY_ShowMenu(config, DISPLAY_MACRO_Main, 0);
 
   EventBits_t bits_set = 0;
 
   while(1)
   {
-    // display stuff depending on position
-
-    if(config->in_menu)
-    {
-      DISPLAY_CmdShowMacro(config, config->current_menu + config->menu_position + 1, DISPLAY_TIMEOUT);
-
-      // we are in a menu, lets wait for some buttons
-      xEventGroupWaitBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_BUTTON_PRESSED, pdTRUE, pdTRUE, portMAX_DELAY);
-
-      if(DISPLAY_DATA_Buttons.plus)
-        config->menu_position++;
-
-      // check for overflow
-      if(config->menu_position >= DISPLAY_GetNumberOfMenuEntries(config->current_menu))
-        config->menu_position = 0;
-
-      if(DISPLAY_DATA_Buttons.minus)
-        config->menu_position--;
-
-      // check for underflow (unsigned int...)
-      if(config->menu_position >= DISPLAY_GetNumberOfMenuEntries(config->current_menu))
-        config->menu_position = DISPLAY_GetNumberOfMenuEntries(config->current_menu) - 1;
-
-      if(DISPLAY_DATA_Buttons.enter)
-      {
-        config->current_menu = DISPLAY_GetSubMenuID(config->current_menu, config->menu_position, &config->in_menu);
-        config->menu_position = 0;
-        DISPLAY_CmdShowMacro(config, config->current_menu, DISPLAY_TIMEOUT);
-      }
-    }
-    else
-    {
-      bits_set = xEventGroupWaitBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_NEW_DATA_ALL, pdTRUE, pdFALSE, portMAX_DELAY);
-
-      if(bits_set & DISPLAY_EVENT_UPDATE)
-      {
-        HAL_GPIO_TogglePin(LED_3_GPIO_Port, LED_3_Pin);
-      }
-
-      if(bits_set & DISPLAY_EVENT_NEW_DATA_CLUTCH_NORMAL)
-      {
-
-      }
-    }
     DISPLAY_DATA_Buttons.enter = pdFALSE;
     DISPLAY_DATA_Buttons.plus = pdFALSE;
     DISPLAY_DATA_Buttons.minus = pdFALSE;
+
+    // display stuff depending on position
+
+    switch(config->current_menu)
+    {
+      // all following menus have the same layout -> can be handled the same way
+      case DISPLAY_MACRO_Main:
+      case DISPLAY_MACRO_ClutchSetup:
+      case DISPLAY_MACRO_Gear:
+      case DISPLAY_MACRO_Power:
+      case DISPLAY_MACRO_Diagnose:
+
+        xEventGroupWaitBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_BUTTON_PRESSED, pdTRUE, pdFALSE, portMAX_DELAY);
+
+        DISPLAY_Navigate(config, DISPLAY_MACRO_MenuInv_1, DISPLAY_DATA_Buttons.plus, DISPLAY_DATA_Buttons.minus, DISPLAY_MenuSize[config->current_menu]);
+
+        if(DISPLAY_DATA_Buttons.enter)
+        {
+          DISPLAY_ShowMenu(config, DISPLAY_MenuMapper[config->current_menu][config->menu_position], 0);
+        }
+
+        break;
+
+      case DISPLAY_MACRO_RacePage:
+
+        bits_set = xEventGroupWaitBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_UPDATE | DISPLAY_EVENT_BUTTON_PRESSED, pdTRUE, pdFALSE, portMAX_DELAY);
+
+        if(bits_set & DISPLAY_EVENT_BUTTON_PRESSED)
+        {
+          if(DISPLAY_DATA_Buttons.enter)
+          {
+            DISPLAY_ShowMenu(config, DISPLAY_MACRO_Main, 0);
+          }
+          else if(DISPLAY_DATA_Buttons.plus)
+          {
+            // TODO Shift UP
+          }
+
+          else if(DISPLAY_DATA_Buttons.minus)
+          {
+            // TODO Shift DOWN
+          }
+        }
+        // TODO display stuff if some other bits are set
+
+        break;
+
+      case DISPLAY_MACRO_ECU:
+
+        // read only page, just wait for button to exit
+        bits_set = xEventGroupWaitBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_UPDATE | DISPLAY_EVENT_BUTTON_PRESSED, pdTRUE, pdFALSE, portMAX_DELAY);
+
+        if(bits_set & DISPLAY_EVENT_BUTTON_PRESSED)
+        {
+          if(DISPLAY_DATA_Buttons.enter)
+          {
+            DISPLAY_ShowMenu(config, DISPLAY_MenuMapper[config->current_menu][config->menu_position], 0);
+          }
+        }
+
+        break;
+
+      case DISPLAY_MACRO_ClutchCalibration:
+
+        bits_set = xEventGroupWaitBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_UPDATE | DISPLAY_EVENT_BUTTON_PRESSED, pdTRUE, pdFALSE, portMAX_DELAY);
+
+        if(bits_set & DISPLAY_EVENT_BUTTON_PRESSED)
+        {
+          if(DISPLAY_DATA_Buttons.enter)
+          {
+            DISPLAY_ShowMenu(config, DISPLAY_MenuMapper[config->current_menu][config->menu_position], 0);
+          }
+          else if(DISPLAY_DATA_Buttons.plus)
+          {
+            // TODO Change Clutch Poti Calibration
+          }
+
+          else if(DISPLAY_DATA_Buttons.minus)
+          {
+            // TODO Change Clutch Poti Calibration
+          }
+        }
+
+      case DISPLAY_MACRO_ClutchNormal:
+
+        bits_set = xEventGroupWaitBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_UPDATE | DISPLAY_EVENT_BUTTON_PRESSED, pdTRUE, pdFALSE, portMAX_DELAY);
+
+        if(bits_set & DISPLAY_EVENT_BUTTON_PRESSED)
+        {
+          DISPLAY_Navigate(config, DISPLAY_MACRO_PageInv_1, DISPLAY_DATA_Buttons.plus, DISPLAY_DATA_Buttons.minus, DISPLAY_MenuSize[config->current_menu]);
+        }
+
+        if(DISPLAY_DATA_Buttons.enter && config->menu_position == 0)
+        {
+          DISPLAY_ShowMenu(config, DISPLAY_MenuMapper[config->current_menu][config->menu_position], 0);
+        }
+    }
   }
 }
 
@@ -137,131 +259,35 @@ static void DISPLAY_Update(TimerHandle_t xTimer)
   xEventGroupSetBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_UPDATE);
 }
 
-static inline uint8_t DISPLAY_GetNumberOfMenuEntries(uint8_t menu_id)
+static inline void DISPLAY_ShowMenu(DISPLAY_Config_t *config, uint8_t menu, uint8_t position)
 {
-  switch(menu_id)
-  {
-    case DISPLAY_MACRO_Main:
-      return 6;
-    case DISPLAY_MACRO_ClutchSetup:
-      return 4;
-    case DISPLAY_MACRO_ClutchNormal:
-      return 8;
-    case DISPLAY_MACRO_Gear:
-      return 3;
-    case DISPLAY_MACRO_Power:
-      return 3;
-    case DISPLAY_MACRO_Diagnose:
-      return 6;
-    default:
-      configASSERT(pdFALSE);
-  }
-  return 0;
+  config->current_menu = menu;
+  config->menu_position = position;
+  DISPLAY_CmdShowMacro(config, config->current_menu, DISPLAY_TIMEOUT);
 }
 
-static inline uint8_t DISPLAY_GetSubMenuID(uint8_t current_menu, uint8_t cursor_position, uint8_t *is_menu)
+static inline void DISPLAY_Navigate(DISPLAY_Config_t *config, uint8_t base_address, uint8_t plus, uint8_t minus, uint8_t nr_entries)
 {
-  switch(current_menu)
-  {
-    case DISPLAY_MACRO_Main:
-      switch(cursor_position)
-      {
-        case 0:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_RacePage;
-        case 1:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_ECU;
-        case 2:
-          *is_menu = pdTRUE;
-          return DISPLAY_MACRO_ClutchSetup;
-        case 3:
-          *is_menu = pdTRUE;
-          return DISPLAY_MACRO_Gear;
-        case 4:
-          *is_menu = pdTRUE;
-          return DISPLAY_MACRO_Power;
-        case 5:
-          *is_menu = pdTRUE;
-          return DISPLAY_MACRO_Diagnose;
-        default:
-          configASSERT(pdFALSE);
-      }
-    case DISPLAY_MACRO_ClutchSetup:
-      switch(cursor_position)
-      {
-        case 0:
-          *is_menu = pdTRUE;
-          return DISPLAY_MACRO_Main;
-        case 1:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_ClutchCalibration;
-        case 2:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_ClutchNormal;
-        case 3:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_ClutchACC;
-        default:
-          configASSERT(pdFALSE);
-      }
-    case DISPLAY_MACRO_Gear:
-      switch(cursor_position)
-      {
-        case 0:
-          *is_menu = pdTRUE;
-          return DISPLAY_MACRO_Main;
-        case 1:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_GearControl;
-        case 2:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_GearACC;
-        default:
-          configASSERT(pdFALSE);
-      }
-    case DISPLAY_MACRO_Power:
-      switch(cursor_position)
-      {
-        case 0:
-          *is_menu = pdTRUE;
-          return DISPLAY_MACRO_Main;
-        case 1:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_PowerFanSetup;
-        case 2:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_PowerLVPD;
-        default:
-          configASSERT(pdFALSE);
-      }
-    case DISPLAY_MACRO_Diagnose:
-      switch(cursor_position)
-      {
-        case 0:
-          *is_menu = pdTRUE;
-          return DISPLAY_MACRO_Main;
-        case 1:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_DiagnoseTireTemp;
-        case 2:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_DiagnoseCarStates;
-        case 3:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_DiagnoseTireStates;
-        case 4:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_DiagnoseBCM;
-        case 5:
-          *is_menu = pdFALSE;
-          return DISPLAY_MACRO_Settings;
-        default:
-          configASSERT(pdFALSE);
-      }
-    default:
-      configASSERT(pdFALSE);
-  }
-  return 0;
+  if(!plus && !minus)
+    return;
+
+  uint8_t old_position = config->menu_position;
+
+  if(plus)
+    config->menu_position++;
+
+  // check for overflow
+  if(config->menu_position >= nr_entries)
+    config->menu_position = 0;
+
+  if(minus)
+    config->menu_position--;
+
+  // check for underflow (unsigned int...)
+  if(config->menu_position >= nr_entries)
+    config->menu_position = nr_entries - 1;
+
+  DISPLAY_CmdShowMacro(config, base_address + old_position, DISPLAY_TIMEOUT);
+  DISPLAY_CmdShowMacro(config, base_address + config->menu_position, DISPLAY_TIMEOUT);
 }
 
