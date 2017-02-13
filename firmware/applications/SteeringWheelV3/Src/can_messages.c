@@ -102,7 +102,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 {
   configASSERT(hcan->pRxMsg->IDE == CAN_ID_STD);
 
-  HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
 
   portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
@@ -126,7 +126,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
-  HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
 }
 
 static inline void CAN_MESSAGES_RxBCM(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)

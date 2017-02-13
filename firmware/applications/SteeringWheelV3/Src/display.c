@@ -206,12 +206,28 @@ static void DISPLAY_Task(void *arg)
 
         if(bits_set & DISPLAY_EVENT_BUTTON_PRESSED)
         {
-          DISPLAY_Navigate(config, DISPLAY_MACRO_PageInv_1, DISPLAY_DATA_Buttons.plus, DISPLAY_DATA_Buttons.minus, DISPLAY_MenuSize[config->current_menu]);
-        }
+          if(DISPLAY_DATA_Buttons.enter)
+          {
+            if(config->menu_position == 0)
+            {
+              DISPLAY_ShowMenu(config, DISPLAY_MenuMapper[config->current_menu][config->menu_position], 0);
+            }
+            else
+            {
+              // toggle edit mode
+              config->edit_mode = !config->edit_mode;
+              DISPLAY_CmdShowMacro(config, DISPLAY_MACRO_PageInv_1 + config->menu_position, DISPLAY_TIMEOUT);
+              DISPLAY_CmdShowMacro(config, DISPLAY_MACRO_PageValue_1 + config->menu_position, DISPLAY_TIMEOUT);
+            }
+          }
+          if(config->edit_mode)
+          {
 
-        if(DISPLAY_DATA_Buttons.enter && config->menu_position == 0)
-        {
-          DISPLAY_ShowMenu(config, DISPLAY_MenuMapper[config->current_menu][config->menu_position], 0);
+          }
+          else
+          {
+            DISPLAY_Navigate(config, DISPLAY_MACRO_PageInv_1, DISPLAY_DATA_Buttons.plus, DISPLAY_DATA_Buttons.minus, DISPLAY_MenuSize[config->current_menu]);
+          }
         }
     }
   }

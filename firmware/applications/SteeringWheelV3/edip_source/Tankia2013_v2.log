@@ -154,6 +154,12 @@ Macro:  13,   1 commands,    11 bytes
 Macro:  14,   1 commands,    11 bytes
 Macro:  15,   1 commands,    11 bytes
 Macro:  16,   1 commands,    11 bytes
+Macro:  19,   1 commands,    11 bytes
+Macro:  20,   1 commands,    11 bytes
+Macro:  21,   1 commands,    11 bytes
+Macro:  22,   1 commands,    11 bytes
+Macro:  23,   1 commands,    11 bytes
+Macro:  24,   1 commands,    11 bytes
 Macro: 200,  10 commands,    55 bytes
 Macro:  25,  19 commands,   265 bytes
 Macro:  30,  51 commands,   368 bytes
@@ -221,7 +227,7 @@ DATA-FLASH Memory overview:
   15 Pictures:       52210 bytes
    0 Animations:         0 bytes
    0 Instruments:        0 bytes
-  68 Macros:          6267 bytes
+  74 Macros:          6333 bytes
    0 Touchmacros:        0 bytes
    0 Portmacros:         0 bytes
    0 Bitmacros:          0 bytes
@@ -229,10 +235,10 @@ DATA-FLASH Memory overview:
    0 Analogmacros:       0 bytes
    0 Processmacros:      0 bytes
  -------------------------------
-            sumary: 158256 bytes
+            sumary: 158322 bytes
 
 connecting eDIPTFT32-A on COM3
 found: eDIPTFT32-A 320x240, color, Smallprotokoll, 4128kB FLASH, 230400 baud
 program file D:\manuel\workspace\layouts.git\firmware\applications\SteeringWheelV3\edip_source\Tankia2013_v2.DF with 115200 baud
 Ok
-Ready: eDIP is programed,  158256 bytes used, 4068816 bytes free
+Ready: eDIP is programed,  158322 bytes used, 4068750 bytes free

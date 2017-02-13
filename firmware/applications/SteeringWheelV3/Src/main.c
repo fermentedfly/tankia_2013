@@ -2,11 +2,9 @@
 #include "stm32f4xx_hal.h"
 #include "drv_adc.h"
 #include "drv_can.h"
-#include "drv_dma.h"
 #include "drv_i2c.h"
 #include "drv_usart.h"
 #include "drv_usb.h"
-#include "drv_gpio.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "SEGGER_SYSVIEW.h"
@@ -15,6 +13,10 @@
 #include "dev_max7313.h"
 #include "rpm_leds.h"
 #include "vcp_forward.h"
+
+void SystemClock_Config(void);
+void MainTask(void *arg);
+static void setupGPIO(void);
 
 #define PROGRAM_MODE 0
 
@@ -215,17 +217,21 @@ VCP_FORWARD_Config_t vcp_forward_config = {
     .uart_config = &uart4_config,
 };
 
-void SystemClock_Config(void);
-void SteeringWheelMainTask(void *arg);
-
 int main(void)
 {
   HAL_Init();
 
   SystemClock_Config();
 
-  MX_GPIO_Init();
-  MX_DMA_Init();
+  // enable clocks
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_DMA1_CLK_ENABLE();
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  setupGPIO();
 
   SEGGER_SYSVIEW_Conf();
 
@@ -237,7 +243,7 @@ int main(void)
   configASSERT(ADC_Init(&hadc1) == HAL_OK);
   configASSERT(HAL_ADC_ConfigChannel(&hadc1, &channel_4_config) == HAL_OK);
 
-  xTaskCreate(SteeringWheelMainTask, "Main", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &SteeringWheelMainTaskHandle);
+  xTaskCreate(MainTask, "Main", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &SteeringWheelMainTaskHandle);
 
   vTaskStartScheduler();
 
@@ -265,7 +271,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* handle)
   CAN_MESSAGES_TransmitFromISR(&hcan1, &ClutchTxMessage);
 }
 
-void SteeringWheelMainTask(void *arg)
+void MainTask(void *arg)
 {
   // enable 5v
   HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
@@ -287,6 +293,18 @@ void SteeringWheelMainTask(void *arg)
   while(1)
   {
     USB_VCP_readBlocking(&USB_Config, &buffer, sizeof(buffer), &bytes_read, portMAX_DELAY);
+
+    if(buffer == 'x')
+    {
+      configASSERT(VCP_FORWARD_Init(&vcp_forward_config) == HAL_OK);
+      vTaskDelay(1000);
+      VCP_FORWARD_Enable(&vcp_forward_config);
+
+      while (1)
+      {
+
+      }
+    }
 
     if(buffer == 'p')
       DISPLAY_DATA_Buttons.plus = pdTRUE;
@@ -348,11 +366,78 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 15, 0);
 }
 
-void Error_Handler(void)
+static void setupGPIO(void)
 {
-  while(1)
-  {
-  }
+  GPIO_InitTypeDef GPIO_InitStruct;
+
+
+    // Configure GPIO pin Output Level
+    HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, LED_0_Pin|LED_1_Pin|LED_2_Pin|LED_3_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(eDIP_Reset_GPIO_Port, eDIP_Reset_Pin, GPIO_PIN_RESET);
+
+    // Outputs
+
+    // enable 5V
+    GPIO_InitStruct.Pin = EN_5V_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(EN_5V_GPIO_Port, &GPIO_InitStruct);
+
+    // LEDS
+    GPIO_InitStruct.Pin = LED_0_Pin|LED_1_Pin|LED_2_Pin|LED_3_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
+
+    // EDIP reset
+    GPIO_InitStruct.Pin = eDIP_Reset_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(eDIP_Reset_GPIO_Port, &GPIO_InitStruct);
+
+    // Inputs
+
+    // MAX Shift Down, Max Minus
+    GPIO_InitStruct.Pin = MAX_SHIFT_DOWN_Pin|MAX_MINUS_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    // MAX Shift Up, Max Plus, Max Enter
+    GPIO_InitStruct.Pin = MAX_Shift_Up_Pin|MAX_Plus_Pin|MAX_Enter_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    // Max nCh
+    GPIO_InitStruct.Pin = nMAX_CH_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(nMAX_CH_GPIO_Port, &GPIO_InitStruct);
+
+
+    // EXTI interrupt initialization
+//    HAL_NVIC_SetPriority(EXTI0_IRQn, 7, 0);
+//    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+//
+//    HAL_NVIC_SetPriority(EXTI1_IRQn, 7, 0);
+//    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+//
+//    HAL_NVIC_SetPriority(EXTI2_IRQn, 7, 0);
+//    HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+//
+//    HAL_NVIC_SetPriority(EXTI4_IRQn, 7, 0);
+//    HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+//
+//    HAL_NVIC_SetPriority(EXTI9_5_IRQn, 7, 0);
+//    HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+//
+//    HAL_NVIC_SetPriority(EXTI15_10_IRQn, 7, 0);
+//    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 void configureTimerForRunTimeStats(void)

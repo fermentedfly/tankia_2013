@@ -35,12 +35,13 @@ MnPageInv_5 = MnPageInv_1 + 4
 MnPageInv_6 = MnPageInv_1 + 5
 MnPageInv_7 = MnPageInv_1 + 6
 
-MnPageValue_2 = MnPageInv_1 + 8
-MnPageValue_3 = MnPageInv_1 + 9
-MnPageValue_4 = MnPageInv_1 + 10
-MnPageValue_5 = MnPageInv_1 + 11
-MnPageValue_6 = MnPageInv_1 + 12
-MnPageValue_7 = MnPageInv_1 + 13
+MnPageValue_1 = MnPageInv_1 + 8
+MnPageValue_2 = MnPageInv_1 + 9
+MnPageValue_3 = MnPageInv_1 + 10
+MnPageValue_4 = MnPageInv_1 + 11
+MnPageValue_5 = MnPageInv_1 + 12
+MnPageValue_6 = MnPageInv_1 + 13
+MnPageValue_7 = MnPageInv_1 + 14
 
 MnMain = 25
 
@@ -206,6 +207,24 @@ Macro MnPageInv_6
 
 Macro MnPageInv_7
 	#RI 290,95,310,225
+
+Macro MnPageValue_2
+	#RI 140,43,160,78
+
+Macro MnPageValue_3
+	#RI 170,43,190,78
+
+Macro MnPageValue_4
+	#RI 200,43,220,78
+
+Macro MnPageValue_5
+	#RI 230,43,250,78
+
+Macro MnPageValue_6
+	#RI 260,43,280,78
+
+Macro MnPageValue_7
+	#RI 200,43,310,78
 
 Macro MnHeader
 	#TC 0				; Cursor invisible
@@ -560,10 +579,10 @@ macro: MnClutchNormal
 	
 	#RE 1,0
 	#FZ WHITE, TRANSPARENT 	
-	#ZB 141,43,157,78,8,"1000"
-	#ZB 171,43,187,78,8,"1000"
-	#ZB 201,43,217,78,8,"1000"
-	#ZB 231,43,247,78,8,"1000"
+	#ZB 141,43,157,78,6,"1000"
+	#ZB 171,43,187,78,6,"1000"
+	#ZB 201,43,217,78,6,"1000"
+	#ZB 231,43,247,78,6,"1000"
 
 	#MN MnPageInv_1
 

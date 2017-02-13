@@ -35,6 +35,7 @@ typedef enum DISPLAY_MACRO
   DISPLAY_MACRO_PageInv_6,
   DISPLAY_MACRO_PageInv_7,
 
+  DISPLAY_MACRO_PageValue_1 = 18,
   DISPLAY_MACRO_PageValue_2,
   DISPLAY_MACRO_PageValue_3,
   DISPLAY_MACRO_PageValue_4,

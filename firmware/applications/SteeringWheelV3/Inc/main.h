@@ -53,30 +53,37 @@
 
 #define EN_5V_Pin GPIO_PIN_0
 #define EN_5V_GPIO_Port GPIOC
+
 #define ADC1_Clutch_Pin GPIO_PIN_4
 #define ADC1_Clutch_GPIO_Port GPIOA
+
 #define MAX_SHIFT_DOWN_Pin GPIO_PIN_4
 #define MAX_SHIFT_DOWN_GPIO_Port GPIOC
+
 #define MAX_MINUS_Pin GPIO_PIN_5
 #define MAX_MINUS_GPIO_Port GPIOC
+
 #define MAX_Shift_Up_Pin GPIO_PIN_0
 #define MAX_Shift_Up_GPIO_Port GPIOB
+
 #define MAX_Plus_Pin GPIO_PIN_1
 #define MAX_Plus_GPIO_Port GPIOB
+
 #define MAX_Enter_Pin GPIO_PIN_2
 #define MAX_Enter_GPIO_Port GPIOB
+
 #define nMAX_CH_Pin GPIO_PIN_10
 #define nMAX_CH_GPIO_Port GPIOB
+
 #define LED_0_Pin GPIO_PIN_12
-#define LED_0_GPIO_Port GPIOB
 #define LED_1_Pin GPIO_PIN_13
-#define LED_1_GPIO_Port GPIOB
 #define LED_2_Pin GPIO_PIN_14
-#define LED_2_GPIO_Port GPIOB
 #define LED_3_Pin GPIO_PIN_15
-#define LED_3_GPIO_Port GPIOB
+#define LED_GPIO_Port GPIOB
+
 #define eDIP_Reset_Pin GPIO_PIN_15
 #define eDIP_Reset_GPIO_Port GPIOA
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
