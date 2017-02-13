@@ -1,6 +1,7 @@
 #include "drv_i2c.h"
-#include "drv_gpio.h"
 #include "FreeRTOS.h"
+
+#ifdef HAL_I2C_MODULE_ENABLED
 
 I2C_HandleTypeDef *I2C1_Handle;
 
@@ -78,3 +79,5 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
 
   }
 } 
+
+#endif

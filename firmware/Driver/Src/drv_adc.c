@@ -1,7 +1,8 @@
 #include "drv_adc.h"
-#include "drv_gpio.h"
 #include "FreeRTOS.h"
 #include "timers.h"
+
+#ifdef HAL_ADC_MODULE_ENABLED
 
 static ADC_HandleTypeDef *ADC_Handle_;
 static TimerHandle_t ADC_ConversionTimerHandle_;
@@ -86,3 +87,5 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 
   }
 } 
+
+#endif

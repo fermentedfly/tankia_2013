@@ -1,7 +1,8 @@
 #include "drv_can.h"
-#include "drv_gpio.h"
 #include "FreeRTOS.h"
 #include "task.h"
+
+#ifdef HAL_CAN_MODULE_ENABLED
 
 static CAN_HandleTypeDef *CAN1_Handle;
 
@@ -94,3 +95,5 @@ void CAN_StartReceive(CAN_HandleTypeDef* hcan, CanRxMsgTypeDef *rx_msg)
   HAL_CAN_Receive_IT(hcan, CAN_FIFO0);
   HAL_CAN_Receive_IT(hcan, CAN_FIFO1);
 }
+
+#endif

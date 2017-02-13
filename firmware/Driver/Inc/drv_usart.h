@@ -2,11 +2,12 @@
 #define __usart_H
 
 #include "stm32f4xx_hal.h"
-#include "main.h"
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "task.h"
 #include "semphr.h"
+
+#ifdef HAL_USART_MODULE_ENABLED
 
 #define UART_DMA_RX_QUEUE_SIZE 1000
 #define UART_DMA_RX_BUFFER_SIZE 1024
@@ -44,5 +45,6 @@ HAL_StatusTypeDef UART_StartReceive_DMACircular(UART_Config_t *config);
 void UART_StopReceiveDMACircular(UART_Config_t *config);
 HAL_StatusTypeDef UART_Transmit(UART_Config_t *config, uint8_t *pData, uint16_t Size, TickType_t timeout);
 
+#endif /* HAL_USART_MODULE_ENABLED */
 #endif /*__ usart_H */
 

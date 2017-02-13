@@ -37,6 +37,18 @@ HAL_StatusTypeDef USB_Init(USB_Config_t *config)
 
   USB_Config = config;
 
+  // Configure GPIO pins : PA10 PA11 PA12
+  GPIO_InitTypeDef GPIO_InitStruct =
+      {
+          .Pin = GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12,
+          .Mode = GPIO_MODE_AF_PP,
+          .Pull = GPIO_NOPULL,
+          .Speed = GPIO_SPEED_FREQ_VERY_HIGH,
+          .Alternate = GPIO_AF10_OTG_FS,
+      };
+
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
   if (config->rxQueue == NULL)
     config->rxQueue = xQueueCreate(4, sizeof(uint8_t));
   if (config->rxQueue == NULL)

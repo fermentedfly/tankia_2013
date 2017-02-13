@@ -1,6 +1,6 @@
 #include "drv_usart.h"
-#include "drv_gpio.h"
-#include "drv_dma.h"
+
+#ifdef HAL_USART_MODULE_ENABLED
 
 static UART_Config_t *UART_uart4_config;
 
@@ -113,10 +113,16 @@ HAL_StatusTypeDef UART4_Init(UART_Config_t *config)
 
   __HAL_LINKDMA(config->handle, hdmarx, *config->dma_rx);
 
+  HAL_NVIC_SetPriority(DMA1_Stream2_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+
   if (HAL_DMA_Init(config->dma_tx) != HAL_OK)
     return HAL_ERROR;
 
   __HAL_LINKDMA(config->handle, hdmatx, *config->dma_tx);
+
+  HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
 
   HAL_NVIC_SetPriority(UART4_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(UART4_IRQn);
@@ -248,4 +254,4 @@ static void UART_Callback_TxComplete(UART_Config_t *config)
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-
+#endif

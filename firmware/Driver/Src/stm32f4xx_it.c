@@ -6,7 +6,6 @@
 
 extern DMA_HandleTypeDef hdma_uart4_tx;
 extern DMA_HandleTypeDef hdma_uart4_rx;
-extern UART_HandleTypeDef huart4;
 
 extern TIM_HandleTypeDef htim1;
 
