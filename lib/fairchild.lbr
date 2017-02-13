@@ -61,7 +61,7 @@
 <layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
-<layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
@@ -85,6 +85,20 @@
 <rectangle x1="0.7112" y1="-1.2954" x2="1.1684" y2="-0.7112" layer="51"/>
 <rectangle x1="-1.1684" y1="-1.2954" x2="-0.7112" y2="-0.7112" layer="51"/>
 </package>
+<package name="PDIP">
+<smd name="5" x="0" y="4.5" dx="1.78" dy="1.52" layer="1"/>
+<smd name="4" x="2.54" y="4.5" dx="1.78" dy="1.52" layer="1"/>
+<smd name="6" x="-2.54" y="4.5" dx="1.78" dy="1.52" layer="1"/>
+<smd name="1" x="-2.54" y="-4.5" dx="1.78" dy="1.52" layer="1"/>
+<smd name="3" x="2.54" y="-4.5" dx="1.78" dy="1.52" layer="1"/>
+<smd name="2" x="0" y="-4.5" dx="1.78" dy="1.52" layer="1"/>
+<wire x1="-4.2" y1="3.2" x2="4.2" y2="3.2" width="0.127" layer="21"/>
+<wire x1="4.2" y1="3.2" x2="4.2" y2="-3.2" width="0.127" layer="21"/>
+<wire x1="4.2" y1="-3.2" x2="-4.2" y2="-3.2" width="0.127" layer="21"/>
+<wire x1="-4.2" y1="-3.2" x2="-4.2" y2="3.2" width="0.127" layer="21"/>
+<text x="-3.81" y="6.35" size="1.27" layer="25">&gt;Name</text>
+<text x="-3.81" y="-7.62" size="1.27" layer="27">&gt;Value</text>
+</package>
 </packages>
 <symbols>
 <symbol name="NPN">
@@ -105,6 +119,64 @@
 <pin name="E" x="2.54" y="-5.08" visible="off" length="short" direction="pas" swaplevel="3" rot="R90"/>
 <pin name="C" x="2.54" y="5.08" visible="off" length="short" direction="pas" swaplevel="2" rot="R270"/>
 </symbol>
+<symbol name="MOC304X">
+<polygon width="0.254" layer="94">
+<vertex x="2.54" y="2.54"/>
+<vertex x="5.08" y="2.54"/>
+<vertex x="3.81" y="0"/>
+</polygon>
+<polygon width="0.254" layer="94">
+<vertex x="5.08" y="0"/>
+<vertex x="7.62" y="0"/>
+<vertex x="6.35" y="2.54"/>
+</polygon>
+<wire x1="8.89" y1="2.54" x2="5.08" y2="2.54" width="0.254" layer="94"/>
+<wire x1="5.08" y1="2.54" x2="1.27" y2="2.54" width="0.254" layer="94"/>
+<wire x1="8.89" y1="0" x2="5.08" y2="0" width="0.254" layer="94"/>
+<wire x1="5.08" y1="0" x2="3.81" y2="0" width="0.254" layer="94"/>
+<wire x1="3.81" y1="0" x2="1.27" y2="0" width="0.254" layer="94"/>
+<wire x1="3.81" y1="0" x2="1.27" y2="-2.54" width="0.127" layer="94"/>
+<wire x1="5.08" y1="0" x2="5.08" y2="-5.08" width="0.127" layer="94"/>
+<wire x1="5.08" y1="2.54" x2="5.08" y2="7.62" width="0.127" layer="94"/>
+<wire x1="1.27" y1="-2.54" x2="1.27" y2="-3.81" width="0.127" layer="94"/>
+<wire x1="2.54" y1="-3.81" x2="1.27" y2="-3.81" width="0.254" layer="94"/>
+<wire x1="1.27" y1="-3.81" x2="-1.27" y2="-3.81" width="0.254" layer="94"/>
+<wire x1="-1.27" y1="-3.81" x2="-2.54" y2="-3.81" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="-3.81" x2="-2.54" y2="-7.62" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="-7.62" x2="2.54" y2="-7.62" width="0.254" layer="94"/>
+<wire x1="2.54" y1="-7.62" x2="2.54" y2="-3.81" width="0.254" layer="94"/>
+<text x="-1.27" y="-6.35" size="1.27" layer="94">ZC</text>
+<wire x1="-1.27" y1="-3.81" x2="-1.27" y2="7.62" width="0.127" layer="94"/>
+<wire x1="-1.27" y1="7.62" x2="5.08" y2="7.62" width="0.127" layer="94"/>
+<wire x1="5.08" y1="7.62" x2="10.16" y2="7.62" width="0.127" layer="94"/>
+<wire x1="5.08" y1="-5.08" x2="10.16" y2="-5.08" width="0.127" layer="94"/>
+<polygon width="0.254" layer="94">
+<vertex x="-7.62" y="5.08"/>
+<vertex x="-5.08" y="5.08"/>
+<vertex x="-6.35" y="2.54"/>
+</polygon>
+<wire x1="-6.35" y1="5.08" x2="-6.35" y2="7.62" width="0.127" layer="94"/>
+<wire x1="-6.35" y1="7.62" x2="-10.16" y2="7.62" width="0.127" layer="94"/>
+<wire x1="-6.35" y1="2.54" x2="-6.35" y2="0" width="0.127" layer="94"/>
+<wire x1="-6.35" y1="0" x2="-10.16" y2="0" width="0.127" layer="94"/>
+<pin name="A" x="-12.7" y="7.62" visible="off" length="short"/>
+<pin name="K" x="-12.7" y="0" visible="off" length="short"/>
+<pin name="MAIN_1" x="12.7" y="7.62" visible="off" length="short" rot="R180"/>
+<pin name="MAIN_2" x="12.7" y="-5.08" visible="off" length="short" rot="R180"/>
+<wire x1="-10.16" y1="7.62" x2="-10.16" y2="10.16" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="10.16" x2="10.16" y2="10.16" width="0.254" layer="94"/>
+<wire x1="10.16" y1="10.16" x2="10.16" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="10.16" y1="-10.16" x2="-10.16" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-10.16" x2="-10.16" y2="7.62" width="0.254" layer="94"/>
+<circle x="5.08" y="7.62" radius="0.127" width="0.127" layer="94"/>
+<wire x1="-7.62" y1="2.54" x2="-5.08" y2="2.54" width="0.254" layer="94"/>
+<text x="-9.652" y="8.128" size="1.27" layer="95">A</text>
+<text x="-9.652" y="0.254" size="1.27" layer="95">K</text>
+<text x="3.556" y="8.128" size="1.27" layer="95">MAIN_1</text>
+<text x="3.556" y="-6.604" size="1.27" layer="95">MAIN_2</text>
+<text x="-10.16" y="10.922" size="1.27" layer="95">&gt;Name</text>
+<text x="-10.16" y="-12.192" size="1.27" layer="95">&gt;Value</text>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="MMBT3904" prefix="T">
@@ -122,6 +194,27 @@
 <technology name="">
 <attribute name="DISTRIBUTOR" value="RS" constant="no"/>
 <attribute name="ORDER_CODE" value="739-0303" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="MOC304X" prefix="U">
+<gates>
+<gate name="G$1" symbol="MOC304X" x="10.16" y="-7.62"/>
+</gates>
+<devices>
+<device name="" package="PDIP">
+<connects>
+<connect gate="G$1" pin="A" pad="1"/>
+<connect gate="G$1" pin="K" pad="2"/>
+<connect gate="G$1" pin="MAIN_1" pad="6"/>
+<connect gate="G$1" pin="MAIN_2" pad="4"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="DISTRIBUTOR" value="RS" constant="no"/>
+<attribute name="ORDER_CODE" value="671-2752" constant="no"/>
 </technology>
 </technologies>
 </device>
