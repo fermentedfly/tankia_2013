@@ -20,14 +20,15 @@ static void setupGPIO(void);
 
 TaskHandle_t SteeringWheelMainTaskHandle;
 
+// http://www.bittiming.can-wiki.info/
 CAN_HandleTypeDef hcan1 =
     {
         .Instance = CAN1,
         .Init = {
-            .Prescaler = 21,
-            .Mode = CAN_MODE_LOOPBACK,
+            .Prescaler = 3,
+            .Mode = CAN_MODE_NORMAL,
             .SJW = CAN_SJW_1TQ,
-            .BS1 = CAN_BS1_13TQ,
+            .BS1 = CAN_BS1_11TQ,
             .BS2 = CAN_BS2_2TQ,
             .TTCM = DISABLE,
             .ABOM = DISABLE,
@@ -222,6 +223,7 @@ int main(void)
   SystemClock_Config();
 
   // enable clocks
+  __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -259,14 +261,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* handle)
 {
-  static CanTxMsgTypeDef ClutchTxMessage = {
-      .IDE = CAN_ID_STD,
-      .StdId = 0x010,
-      .DLC = 1,
-  };
-
-  ClutchTxMessage.Data[0] = HAL_ADC_GetValue(handle) / 16; //convert 12Bit ADC to 8Bit Clutch
-  CAN_MESSAGES_TransmitFromISR(&hcan1, &ClutchTxMessage);
+  CAN_MESSAGES_TransmitSWClutch(&hcan1, HAL_ADC_GetValue(handle) / 16, pdTRUE); //convert 12Bit ADC to 8Bit Clutch
 }
 
 void MainTask(void *arg)

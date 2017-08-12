@@ -3,6 +3,13 @@
 #include "semphr.h"
 #include "string.h"
 
+typedef enum BargraphsNr
+{
+	Bargraph_Water = 1,
+	Bargraph_Oil = 2,
+
+} BargraphNr_t;
+
 DISPLAY_Racepage_t DISPLAY_DATA_Racepage;
 DISPLAY_Clutch_Normal_t DISPLAY_DATA_ClutchNormal;
 DISPLAY_GearACC_t DISPLAY_DATA_GearACC;
@@ -14,7 +21,7 @@ DISPLAY_BUTTON_t DISPLAY_DATA_Buttons;
 
 EventGroupHandle_t DISPLAY_NewDataEventHandle;
 
-static const uint8_t const DISPLAY_MenuMainSubAddress[] = {
+static const uint8_t const MenuMainSubAddress[] = {
     DISPLAY_MACRO_RacePage,
     DISPLAY_MACRO_ECU,
     DISPLAY_MACRO_ClutchSetup,
@@ -23,26 +30,26 @@ static const uint8_t const DISPLAY_MenuMainSubAddress[] = {
     DISPLAY_MACRO_Diagnose
 };
 
-static const uint8_t const DISPLAY_MenuClutchSubAddress[] = {
+static const uint8_t const MenuClutchSubAddress[] = {
     DISPLAY_MACRO_Main,
     DISPLAY_MACRO_ClutchCalibration,
     DISPLAY_MACRO_ClutchNormal,
     DISPLAY_MACRO_ClutchACC
 };
 
-static const uint8_t const DISPLAY_MenuGearSubAddress[] = {
+static const uint8_t const MenuGearSubAddress[] = {
     DISPLAY_MACRO_Main,
     DISPLAY_MACRO_GearControl,
     DISPLAY_MACRO_GearACC,
 };
 
-static const uint8_t const DISPLAY_MenuPowerSubAddress[] = {
+static const uint8_t const MenuPowerSubAddress[] = {
     DISPLAY_MACRO_Main,
     DISPLAY_MACRO_PowerFanSetup,
     DISPLAY_MACRO_PowerLVPD,
 };
 
-static const uint8_t const DISPLAY_MenuDiagnoseAddress[] = {
+static const uint8_t const MenuDiagnoseAddress[] = {
     DISPLAY_MACRO_Main,
     DISPLAY_MACRO_DiagnoseTireTemp,
     DISPLAY_MACRO_DiagnoseCarStates,
@@ -51,31 +58,31 @@ static const uint8_t const DISPLAY_MenuDiagnoseAddress[] = {
     DISPLAY_MACRO_DiagnoseSettings
 };
 
-static const uint8_t const DISPLAY_MenuECUAddress[] = {
+static const uint8_t const MenuECUAddress[] = {
     DISPLAY_MACRO_Main,
 };
 
-static const uint8_t const DISPLAY_MenuClutchCalibrationAddress[] = {
+static const uint8_t const MenuClutchCalibrationAddress[] = {
     DISPLAY_MACRO_ClutchSetup,
 };
 
-static const uint8_t const DISPLAY_MenuClutchNormalAddress[] = {
+static const uint8_t const MenuClutchNormalAddress[] = {
     DISPLAY_MACRO_ClutchSetup,
 };
 
-static const uint8_t const * const DISPLAY_MenuMapper[] = {
-    [DISPLAY_MACRO_Main] = DISPLAY_MenuMainSubAddress,
-    [DISPLAY_MACRO_ClutchSetup] = DISPLAY_MenuClutchSubAddress,
-    [DISPLAY_MACRO_Gear] = DISPLAY_MenuGearSubAddress,
-    [DISPLAY_MACRO_Power] = DISPLAY_MenuPowerSubAddress,
-    [DISPLAY_MACRO_Diagnose] = DISPLAY_MenuDiagnoseAddress,
+static const uint8_t const * const MenuMapper[] = {
+    [DISPLAY_MACRO_Main] = MenuMainSubAddress,
+    [DISPLAY_MACRO_ClutchSetup] = MenuClutchSubAddress,
+    [DISPLAY_MACRO_Gear] = MenuGearSubAddress,
+    [DISPLAY_MACRO_Power] = MenuPowerSubAddress,
+    [DISPLAY_MACRO_Diagnose] = MenuDiagnoseAddress,
 
-    [DISPLAY_MACRO_ECU] = DISPLAY_MenuECUAddress,
-    [DISPLAY_MACRO_ClutchCalibration] = DISPLAY_MenuClutchCalibrationAddress,
-    [DISPLAY_MACRO_ClutchNormal] = DISPLAY_MenuClutchNormalAddress,
+    [DISPLAY_MACRO_ECU] = MenuECUAddress,
+    [DISPLAY_MACRO_ClutchCalibration] = MenuClutchCalibrationAddress,
+    [DISPLAY_MACRO_ClutchNormal] = MenuClutchNormalAddress,
 };
 
-static const uint8_t const DISPLAY_MenuSize[] = {
+static const uint8_t const MenuSize[] = {
     [DISPLAY_MACRO_Main] = 6,
     [DISPLAY_MACRO_ClutchSetup] = 4,
     [DISPLAY_MACRO_Gear] = 3,
@@ -85,30 +92,31 @@ static const uint8_t const DISPLAY_MenuSize[] = {
     [DISPLAY_MACRO_ClutchNormal] = 5,
 };
 
-static inline HAL_StatusTypeDef DISPLAY_SendCommand(DISPLAY_Config_t *config, uint8_t *message, uint32_t length, TickType_t timeout);
-static HAL_StatusTypeDef DISPLAY_CmdShowMacro(DISPLAY_Config_t *config, uint32_t macro_number, TickType_t timeout);
-static void DISPLAY_Task(void *arg);
-static void DISPLAY_Update(TimerHandle_t xTimer);
-static inline void DISPLAY_ShowMenu(DISPLAY_Config_t *config, uint8_t menu, uint8_t position);
-static inline void DISPLAY_Navigate(DISPLAY_Config_t *config, uint8_t base_address, uint8_t plus, uint8_t minus, uint8_t nr_entries);
+static inline HAL_StatusTypeDef SendCommand(DISPLAY_Config_t *config, uint8_t *message, uint32_t length, TickType_t timeout);
+static HAL_StatusTypeDef CmdShowMacro(DISPLAY_Config_t *config, uint32_t macro_number, TickType_t timeout);
+static HAL_StatusTypeDef CmdSetBargraphValue(DISPLAY_Config_t *config, uint32_t nr, uint32_t value, TickType_t timeout);
+static void Task(void *arg);
+static void Update(TimerHandle_t xTimer);
+static inline void ShowMenu(DISPLAY_Config_t *config, uint8_t menu, uint8_t position);
+static inline void Navigate(DISPLAY_Config_t *config, uint8_t base_address, uint8_t plus, uint8_t minus, uint8_t nr_entries);
 
 HAL_StatusTypeDef DISPLAY_Init(DISPLAY_Config_t *config)
 {
   DISPLAY_NewDataEventHandle = xEventGroupCreate();
 
-  if(xTaskCreate(DISPLAY_Task, "DISPLAY", DISPLAY_TASK_STACK_SIZE, config, tskIDLE_PRIORITY + 2, &config->task_handle) != pdPASS)
+  if(xTaskCreate(Task, "DISPLAY", DISPLAY_TASK_STACK_SIZE, config, tskIDLE_PRIORITY + 2, &config->task_handle) != pdPASS)
     return HAL_ERROR;
-  config->update_timer = xTimerCreate("DISPLAY UPDATE", 25 / portTICK_PERIOD_MS, pdTRUE, config, DISPLAY_Update);
+  config->update_timer = xTimerCreate("DISPLAY UPDATE", 25 / portTICK_PERIOD_MS, pdTRUE, config, Update);
 
   return HAL_OK;
 }
 
-static void DISPLAY_Task(void *arg)
+static void Task(void *arg)
 {
   DISPLAY_Config_t *config = (DISPLAY_Config_t *)arg;
 
   // show main menu initially
-  DISPLAY_ShowMenu(config, DISPLAY_MACRO_Main, 0);
+  ShowMenu(config, DISPLAY_MACRO_Main, 0);
 
   EventBits_t bits_set = 0;
 
@@ -131,11 +139,11 @@ static void DISPLAY_Task(void *arg)
 
         xEventGroupWaitBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_BUTTON_PRESSED, pdTRUE, pdFALSE, portMAX_DELAY);
 
-        DISPLAY_Navigate(config, DISPLAY_MACRO_MenuInv_1, DISPLAY_DATA_Buttons.plus, DISPLAY_DATA_Buttons.minus, DISPLAY_MenuSize[config->current_menu]);
+        Navigate(config, DISPLAY_MACRO_MenuInv_1, DISPLAY_DATA_Buttons.plus, DISPLAY_DATA_Buttons.minus, MenuSize[config->current_menu]);
 
         if(DISPLAY_DATA_Buttons.enter)
         {
-          DISPLAY_ShowMenu(config, DISPLAY_MenuMapper[config->current_menu][config->menu_position], 0);
+          ShowMenu(config, MenuMapper[config->current_menu][config->menu_position], 0);
         }
 
         break;
@@ -148,7 +156,7 @@ static void DISPLAY_Task(void *arg)
         {
           if(DISPLAY_DATA_Buttons.enter)
           {
-            DISPLAY_ShowMenu(config, DISPLAY_MACRO_Main, 0);
+            ShowMenu(config, DISPLAY_MACRO_Main, 0);
           }
           else if(DISPLAY_DATA_Buttons.plus)
           {
@@ -159,6 +167,11 @@ static void DISPLAY_Task(void *arg)
           {
             // TODO Shift DOWN
           }
+        }
+        else if(bits_set & DISPLAY_EVENT_UPDATE)
+        {
+        	CmdSetBargraphValue(config, Bargraph_Water, DISPLAY_DATA_Racepage.twat > 0 ? DISPLAY_DATA_Racepage.twat : 0, DISPLAY_TIMEOUT);
+        	CmdSetBargraphValue(config, Bargraph_Oil, DISPLAY_DATA_Racepage.toil > 0 ? DISPLAY_DATA_Racepage.toil : 0, DISPLAY_TIMEOUT);
         }
         // TODO display stuff if some other bits are set
 
@@ -173,7 +186,7 @@ static void DISPLAY_Task(void *arg)
         {
           if(DISPLAY_DATA_Buttons.enter)
           {
-            DISPLAY_ShowMenu(config, DISPLAY_MenuMapper[config->current_menu][config->menu_position], 0);
+            ShowMenu(config, MenuMapper[config->current_menu][config->menu_position], 0);
           }
         }
 
@@ -187,7 +200,7 @@ static void DISPLAY_Task(void *arg)
         {
           if(DISPLAY_DATA_Buttons.enter)
           {
-            DISPLAY_ShowMenu(config, DISPLAY_MenuMapper[config->current_menu][config->menu_position], 0);
+            ShowMenu(config, MenuMapper[config->current_menu][config->menu_position], 0);
           }
           else if(DISPLAY_DATA_Buttons.plus)
           {
@@ -210,14 +223,14 @@ static void DISPLAY_Task(void *arg)
           {
             if(config->menu_position == 0)
             {
-              DISPLAY_ShowMenu(config, DISPLAY_MenuMapper[config->current_menu][config->menu_position], 0);
+              ShowMenu(config, MenuMapper[config->current_menu][config->menu_position], 0);
             }
             else
             {
               // toggle edit mode
               config->edit_mode = !config->edit_mode;
-              DISPLAY_CmdShowMacro(config, DISPLAY_MACRO_PageInv_1 + config->menu_position, DISPLAY_TIMEOUT);
-              DISPLAY_CmdShowMacro(config, DISPLAY_MACRO_PageValue_1 + config->menu_position, DISPLAY_TIMEOUT);
+              CmdShowMacro(config, DISPLAY_MACRO_PageInv_1 + config->menu_position, DISPLAY_TIMEOUT);
+              CmdShowMacro(config, DISPLAY_MACRO_PageValue_1 + config->menu_position, DISPLAY_TIMEOUT);
             }
           }
           if(config->edit_mode)
@@ -226,14 +239,14 @@ static void DISPLAY_Task(void *arg)
           }
           else
           {
-            DISPLAY_Navigate(config, DISPLAY_MACRO_PageInv_1, DISPLAY_DATA_Buttons.plus, DISPLAY_DATA_Buttons.minus, DISPLAY_MenuSize[config->current_menu]);
+            Navigate(config, DISPLAY_MACRO_PageInv_1, DISPLAY_DATA_Buttons.plus, DISPLAY_DATA_Buttons.minus, MenuSize[config->current_menu]);
           }
         }
     }
   }
 }
 
-static HAL_StatusTypeDef DISPLAY_SendCommand(DISPLAY_Config_t *config, uint8_t *message, uint32_t length, TickType_t timeout)
+static HAL_StatusTypeDef SendCommand(DISPLAY_Config_t *config, uint8_t *message, uint32_t length, TickType_t timeout)
 {
   uint8_t response = 0;
 
@@ -261,28 +274,38 @@ static HAL_StatusTypeDef DISPLAY_SendCommand(DISPLAY_Config_t *config, uint8_t *
   return HAL_OK;
 }
 
-static HAL_StatusTypeDef DISPLAY_CmdShowMacro(DISPLAY_Config_t *config, uint32_t macro_number, TickType_t timeout)
+static HAL_StatusTypeDef CmdShowMacro(DISPLAY_Config_t *config, uint32_t macro_number, TickType_t timeout)
 {
   static uint8_t buffer[] = {DISPLAY_DC_1, 4, DISPLAY_ESC, 'M', 'N', 0x00, 0x00};
 
   buffer[5] = macro_number;
 
-  return DISPLAY_SendCommand(config, buffer, 7 , timeout);
+  return SendCommand(config, buffer, 7 , timeout);
 }
 
-static void DISPLAY_Update(TimerHandle_t xTimer)
+static HAL_StatusTypeDef CmdSetBargraphValue(DISPLAY_Config_t *config, uint32_t nr, uint32_t value, TickType_t timeout)
+{
+	static uint8_t buffer[] = {DISPLAY_DC_1, 5, DISPLAY_ESC, 'B', 'A', 0x00, 0x00, 0x00};
+
+	buffer[5] = nr;
+	buffer[6] = value;
+
+	return SendCommand(config, buffer, 8 , timeout);
+}
+
+static void Update(TimerHandle_t xTimer)
 {
   xEventGroupSetBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_UPDATE);
 }
 
-static inline void DISPLAY_ShowMenu(DISPLAY_Config_t *config, uint8_t menu, uint8_t position)
+static inline void ShowMenu(DISPLAY_Config_t *config, uint8_t menu, uint8_t position)
 {
   config->current_menu = menu;
   config->menu_position = position;
-  DISPLAY_CmdShowMacro(config, config->current_menu, DISPLAY_TIMEOUT);
+  CmdShowMacro(config, config->current_menu, DISPLAY_TIMEOUT);
 }
 
-static inline void DISPLAY_Navigate(DISPLAY_Config_t *config, uint8_t base_address, uint8_t plus, uint8_t minus, uint8_t nr_entries)
+static inline void Navigate(DISPLAY_Config_t *config, uint8_t base_address, uint8_t plus, uint8_t minus, uint8_t nr_entries)
 {
   if(!plus && !minus)
     return;
@@ -303,7 +326,7 @@ static inline void DISPLAY_Navigate(DISPLAY_Config_t *config, uint8_t base_addre
   if(config->menu_position >= nr_entries)
     config->menu_position = nr_entries - 1;
 
-  DISPLAY_CmdShowMacro(config, base_address + old_position, DISPLAY_TIMEOUT);
-  DISPLAY_CmdShowMacro(config, base_address + config->menu_position, DISPLAY_TIMEOUT);
+  CmdShowMacro(config, base_address + old_position, DISPLAY_TIMEOUT);
+  CmdShowMacro(config, base_address + config->menu_position, DISPLAY_TIMEOUT);
 }
 
