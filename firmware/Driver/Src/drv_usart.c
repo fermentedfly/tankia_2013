@@ -1,6 +1,6 @@
 #include "drv_usart.h"
 
-#ifdef HAL_USART_MODULE_ENABLED
+#ifdef HAL_UART_MODULE_ENABLED
 
 static UART_Config_t *UART_uart4_config;
 

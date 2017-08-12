@@ -18,8 +18,6 @@ void SystemClock_Config(void);
 void MainTask(void *arg);
 static void setupGPIO(void);
 
-#define PROGRAM_MODE 0
-
 TaskHandle_t SteeringWheelMainTaskHandle;
 
 CAN_HandleTypeDef hcan1 =
@@ -281,7 +279,6 @@ void MainTask(void *arg)
 
   vTaskDelay(100);
 
-#if PROGRAM_MODE == 0
   CAN_MESSAGES_Init(&hcan1);
   configASSERT(RPM_LEDS_Init(&max7313_config) == HAL_OK);
   configASSERT(DISPLAY_Init(&display_config) == HAL_OK);
@@ -317,17 +314,6 @@ void MainTask(void *arg)
 
     xEventGroupSetBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_BUTTON_PRESSED);
   }
-
-#else
-  configASSERT(VCP_FORWARD_Init(&vcp_forward_config) == HAL_OK);
-  vTaskDelay(1000);
-  VCP_FORWARD_Enable(&vcp_forward_config);
-
-  while (1)
-  {
-
-  }
-#endif
 }
 
 void SystemClock_Config(void)
