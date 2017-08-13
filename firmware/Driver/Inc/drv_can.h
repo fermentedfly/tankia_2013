@@ -5,8 +5,12 @@
 
 #ifdef HAL_CAN_MODULE_ENABLED
 
-HAL_StatusTypeDef CAN_Init(CAN_HandleTypeDef* hcan);
-void CAN_StartReceive(CAN_HandleTypeDef* hcan, CanRxMsgTypeDef *rx_msg);
+#include "stm32f4xx_hal.h"
+
+typedef void (* CAN_rxCallback)(CanRxMsgTypeDef *msg);
+
+HAL_StatusTypeDef CAN_startContinousReceive(CAN_HandleTypeDef* handle, CAN_rxCallback callback);
+void CAN_Transmit(CAN_HandleTypeDef* hcan, CanTxMsgTypeDef *tx_msg, uint8_t fromISR);
 
 #endif /* HAL_CAN_MODULE_ENABLED */
 #endif /*__ can_H */

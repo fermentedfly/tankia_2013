@@ -10,8 +10,7 @@
 
 #include "stm32f4xx_hal.h"
 
-#define CAN_MESSAGES_TX_TASK_STACK_SIZE 128
-#define CAN1_BANK_NUMBER 28
+#define CAN1_BANK_NUMBER 14
 #define CAN_MESSAGES_EVENTS_ALL 0xFFFFFFFF
 
 // CAN Message IDS
@@ -236,7 +235,6 @@ typedef struct __attribute__((__packed__)) CAN_MO_MS4_SBDB
 } CAN_MO_MS4_SBDB_t;
 
 void CAN_MESSAGES_Init(CAN_HandleTypeDef* hcan);
-void CAN_MESSAGES_Transmit(CAN_HandleTypeDef* hcan, CanTxMsgTypeDef *tx_msg, uint8_t fromISR);
 void CAN_MESSAGES_TransmitSWShift(CAN_HandleTypeDef* hcan, CAN_MO_SW_Shift_Direction_t direction, uint8_t fromISR);
 void CAN_MESSAGES_TransmitSWClutch(CAN_HandleTypeDef* hcan, uint8_t value, uint8_t fromISR);
 

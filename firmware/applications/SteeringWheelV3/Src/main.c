@@ -31,8 +31,8 @@ CAN_HandleTypeDef hcan1 =
             .BS1 = CAN_BS1_11TQ,
             .BS2 = CAN_BS2_2TQ,
             .TTCM = DISABLE,
-            .ABOM = DISABLE,
-            .AWUM = DISABLE,
+            .ABOM = ENABLE,
+            .AWUM = ENABLE,
             .NART = DISABLE,
             .RFLM = DISABLE,
             .TXFP = DISABLE,
@@ -235,7 +235,7 @@ int main(void)
 
   SEGGER_SYSVIEW_Conf();
 
-  configASSERT(CAN_Init(&hcan1) == HAL_OK);
+  configASSERT(HAL_CAN_Init(&hcan1) == HAL_OK);
   configASSERT(I2C_Init(&hi2c1) == HAL_OK);
   configASSERT(UART4_Init(&uart4_config) == HAL_OK);
   configASSERT(USB_Init(&USB_Config) == HAL_OK);

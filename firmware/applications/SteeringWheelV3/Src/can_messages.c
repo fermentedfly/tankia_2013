@@ -14,18 +14,12 @@
 #include "event_groups.h"
 #include "rpm_leds.h"
 
-QueueHandle_t CAN_MESSAGES_TxQueue;
-SemaphoreHandle_t CAN_MESSAGES_TxDoneSignal;
-
-static TaskHandle_t CAN_MESSAGES_TxTaskHandle;
-static CanRxMsgTypeDef CAN1_RxMessage;
-
 static CAN_FilterConfTypeDef CAN_filter_BCM = {
     .FilterNumber = CAN_MO_FILTER_NR_BCM,
     .BankNumber = CAN1_BANK_NUMBER,
     .FilterActivation = ENABLE,
     .FilterMode = CAN_FILTERMODE_IDMASK,
-    .FilterScale = CAN_FILTERSCALE_32BIT,
+    .FilterScale = CAN_FILTERSCALE_16BIT,
     .FilterFIFOAssignment = CAN_FilterFIFO0,
 
     .FilterIdHigh = CAN_MO_ID_BCM_STATUS << 5,
@@ -58,46 +52,43 @@ static CAN_FilterConfTypeDef CAN_filter_MS4 = {
     .FilterScale = CAN_FILTERSCALE_16BIT,
     .FilterFIFOAssignment = CAN_FilterFIFO1,
 
-    .FilterIdHigh = 0x0000,     // disable
-    .FilterMaskIdHigh = 0xFFFF,
+    .FilterIdHigh = CAN_MO_ID_MS4_SBDB,     // disable
+    .FilterMaskIdHigh = 0x7F0 << 5, // match everything except 4 LSB
 
     .FilterIdLow = CAN_MO_ID_MS4_IRA << 5,
     .FilterMaskIdLow = 0x7F0 << 5, // match everything except 4 LSB
 };
 
-static inline void CAN_MESSAGES_RxBCM(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
-static inline void CAN_MESSAGES_RxLVPD(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
-static inline void CAN_MESSAGES_RxMS4(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
-static void CAN_MESSAGES_TxTask(void *arg);
+static void RxCallback(CanRxMsgTypeDef *rxMsg);
+static inline void RxBCM(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
+static inline void RxLVPD(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
+static inline void RxMS4(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield);
 
 void CAN_MESSAGES_Init(CAN_HandleTypeDef* hcan)
 {
-  CAN_MESSAGES_TxQueue = xQueueCreate(20, sizeof(CanTxMsgTypeDef));
-  CAN_MESSAGES_TxDoneSignal = xSemaphoreCreateBinary();
+//  configASSERT(HAL_CAN_ConfigFilter(hcan, &CAN_filter_MS4) == HAL_OK);
+  configASSERT(HAL_CAN_ConfigFilter(hcan, &CAN_filter_LVPD) == HAL_OK);
+  configASSERT(HAL_CAN_ConfigFilter(hcan, &CAN_filter_BCM) == HAL_OK);
 
-  xTaskCreate(CAN_MESSAGES_TxTask, "CAN TX", CAN_MESSAGES_TX_TASK_STACK_SIZE, hcan, tskIDLE_PRIORITY + 2, &CAN_MESSAGES_TxTaskHandle);
+//  CAN_FilterConfTypeDef can_filter = {
+//    .FilterNumber = 0,
+//    .FilterMode = CAN_FILTERMODE_IDMASK,
+//    .FilterScale = CAN_FILTERSCALE_32BIT,
+//    .FilterIdHigh = 0x0000,
+//    .FilterIdLow = 0x0000,
+//    .FilterMaskIdHigh = 0x0000,
+//    .FilterMaskIdLow = 0x0000,
+//    .FilterFIFOAssignment = 0,
+//    .FilterActivation = ENABLE,
+//    .BankNumber = 14
+//  };
+//
+//  configASSERT(HAL_CAN_ConfigFilter(hcan, &can_filter) == HAL_OK);
 
   if(hcan->Instance == CAN1)
   {
-    CAN_StartReceive(hcan, &CAN1_RxMessage);
+    configASSERT(CAN_startContinousReceive(hcan, RxCallback) == HAL_OK);
   }
-  configASSERT(HAL_CAN_ConfigFilter(hcan, &CAN_filter_MS4) == HAL_OK);
-  configASSERT(HAL_CAN_ConfigFilter(hcan, &CAN_filter_LVPD) == HAL_OK);
-  configASSERT(HAL_CAN_ConfigFilter(hcan, &CAN_filter_BCM) == HAL_OK);
-}
-
-void CAN_MESSAGES_Transmit(CAN_HandleTypeDef* hcan, CanTxMsgTypeDef *tx_msg, uint8_t fromISR)
-{
-	if(fromISR)
-	{
-		  portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-		  xQueueSendFromISR(CAN_MESSAGES_TxQueue, tx_msg, &xHigherPriorityTaskWoken);
-		  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-	}
-	else
-	{
-		xQueueSend(CAN_MESSAGES_TxQueue, tx_msg, portMAX_DELAY);
-	}
 }
 
 void CAN_MESSAGES_TransmitSWShift(CAN_HandleTypeDef* hcan, CAN_MO_SW_Shift_Direction_t direction, uint8_t fromISR)
@@ -110,7 +101,7 @@ void CAN_MESSAGES_TransmitSWShift(CAN_HandleTypeDef* hcan, CAN_MO_SW_Shift_Direc
 	};
 
 	((CAN_MO_SW_Shift_t *)msg.Data)->direction = direction;
-	CAN_MESSAGES_Transmit(hcan, &msg, fromISR);
+	CAN_Transmit(hcan, &msg, fromISR);
 }
 
 void CAN_MESSAGES_TransmitSWClutch(CAN_HandleTypeDef* hcan, uint8_t value, uint8_t fromISR)
@@ -123,48 +114,38 @@ void CAN_MESSAGES_TransmitSWClutch(CAN_HandleTypeDef* hcan, uint8_t value, uint8
 	};
 
 	((CAN_MO_SW_Clutch_t *)msg.Data)->value = value;
-	CAN_MESSAGES_Transmit(hcan, &msg, fromISR);
+	CAN_Transmit(hcan, &msg, fromISR);
 }
 
-void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
+static void RxCallback(CanRxMsgTypeDef *rxMsg)
 {
-  configASSERT(hcan->pRxMsg->IDE == CAN_ID_STD);
+  configASSERT(rxMsg->IDE == CAN_ID_STD);
 
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
 
   portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
-  if(hcan->pRxMsg->FMI == CAN_MO_FILTER_NR_BCM)
+  if(rxMsg->FMI == CAN_MO_FILTER_NR_BCM)
   {
-    CAN_MESSAGES_RxBCM(hcan->pRxMsg, &xHigherPriorityTaskWoken);
+    RxBCM(rxMsg, &xHigherPriorityTaskWoken);
   }
 
-  if(hcan->pRxMsg->FMI == CAN_MO_FILTER_NR_LVPD)
+  if(rxMsg->FMI == CAN_MO_FILTER_NR_LVPD)
   {
-    CAN_MESSAGES_RxLVPD(hcan->pRxMsg, &xHigherPriorityTaskWoken);
+    RxLVPD(rxMsg, &xHigherPriorityTaskWoken);
   }
 
-  if(hcan->pRxMsg->FMI == CAN_MO_FILTER_NR_MS4)
+  if(rxMsg->FMI == CAN_MO_FILTER_NR_MS4)
   {
-    CAN_MESSAGES_RxMS4(hcan->pRxMsg, &xHigherPriorityTaskWoken);
+    RxMS4(rxMsg, &xHigherPriorityTaskWoken);
   }
-
-  // restart receive
-  HAL_CAN_Receive_IT(hcan, hcan->pRxMsg->FIFONumber);
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
 }
 
-void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
-{
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(CAN_MESSAGES_TxDoneSignal, &xHigherPriorityTaskWoken);
-	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-}
-
-static inline void CAN_MESSAGES_RxBCM(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)
+static inline void RxBCM(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)
 {
   switch(pRxMsg->StdId)
   {
@@ -222,7 +203,7 @@ static inline void CAN_MESSAGES_RxBCM(CanRxMsgTypeDef *pRxMsg, BaseType_t *porty
   }
 }
 
-static inline void CAN_MESSAGES_RxLVPD(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)
+static inline void RxLVPD(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)
 {
   switch(pRxMsg->StdId)
   {
@@ -249,7 +230,7 @@ static inline void CAN_MESSAGES_RxLVPD(CanRxMsgTypeDef *pRxMsg, BaseType_t *port
   }
 }
 
-static inline void CAN_MESSAGES_RxMS4(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)
+static inline void RxMS4(CanRxMsgTypeDef *pRxMsg, BaseType_t *portyield)
 {
   switch(pRxMsg->StdId)
   {
@@ -297,22 +278,4 @@ static inline void CAN_MESSAGES_RxMS4(CanRxMsgTypeDef *pRxMsg, BaseType_t *porty
     	break;
     }
   }
-}
-
-static void CAN_MESSAGES_TxTask(void *arg)
-{
-  CAN_HandleTypeDef *handle = (CAN_HandleTypeDef *)arg;
-  CanTxMsgTypeDef tx_msg;
-
-  while(1)
-  {
-    xQueueReceive(CAN_MESSAGES_TxQueue, &tx_msg, portMAX_DELAY);
-
-    handle->pTxMsg = &tx_msg;
-    HAL_StatusTypeDef rval = HAL_CAN_Transmit_IT(handle);
-    configASSERT(rval == HAL_OK);
-
-    xSemaphoreTake(CAN_MESSAGES_TxDoneSignal, portMAX_DELAY);
-  }
-
 }
