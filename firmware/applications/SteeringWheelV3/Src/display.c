@@ -10,6 +10,28 @@ typedef enum BargraphsNr
 
 } BargraphNr_t;
 
+typedef enum TextAlignment
+{
+  TextAlignment_TopLeft = 1,
+  TextAlignment_TopCenter = 2,
+  TextAlignment_TopRight = 3,
+  TextAlignment_MiddleLeft = 4,
+  TextAlignment_MiddleCenter = 5,
+  TextAlignment_MiddleRight = 6,
+  TextAlignment_BottomLeft = 7,
+  TextAlignment_BottomCenter = 8,
+  TextAlignment_BottomRight = 9,
+} TextAlignment_t;
+
+typedef struct Textbox
+{
+  uint32_t x1;
+  uint32_t y1;
+  uint32_t x2;
+  uint32_t y2;
+
+} Textbox_t;
+
 DISPLAY_Racepage_t DISPLAY_DATA_Racepage;
 DISPLAY_Clutch_Normal_t DISPLAY_DATA_ClutchNormal;
 DISPLAY_GearACC_t DISPLAY_DATA_GearACC;
@@ -92,9 +114,15 @@ static const uint8_t const MenuSize[] = {
     [DISPLAY_MACRO_ClutchNormal] = 5,
 };
 
+static Textbox_t RacepageTextOil = {
+    .x1 = 1, .y1 = 1, .x2 = 50, .y2 = 50
+};
+
 static inline HAL_StatusTypeDef SendCommand(DISPLAY_Config_t *config, uint8_t *message, uint32_t length, TickType_t timeout);
 static HAL_StatusTypeDef CmdShowMacro(DISPLAY_Config_t *config, uint32_t macro_number, TickType_t timeout);
 static HAL_StatusTypeDef CmdSetBargraphValue(DISPLAY_Config_t *config, uint32_t nr, uint32_t value, TickType_t timeout);
+static HAL_StatusTypeDef CmdSetFont(DISPLAY_Config_t *config, uint32_t font_number, TickType_t timeout);
+static HAL_StatusTypeDef CmdSetText(DISPLAY_Config_t *config, Textbox_t *coordintes, TextAlignment_t alignment, uint32_t length, const char *text, TickType_t timeout);
 static void Task(void *arg);
 static void Update(TimerHandle_t xTimer);
 static inline void ShowMenu(DISPLAY_Config_t *config, uint8_t menu, uint8_t position);
@@ -106,7 +134,10 @@ HAL_StatusTypeDef DISPLAY_Init(DISPLAY_Config_t *config)
 
   if(xTaskCreate(Task, "DISPLAY", DISPLAY_TASK_STACK_SIZE, config, tskIDLE_PRIORITY + 2, &config->task_handle) != pdPASS)
     return HAL_ERROR;
-  config->update_timer = xTimerCreate("DISPLAY UPDATE", 25 / portTICK_PERIOD_MS, pdTRUE, config, Update);
+  if((config->update_timer = xTimerCreate("DISPLAY UPDATE", 25 / portTICK_PERIOD_MS, pdTRUE, config, Update)) == NULL)
+    return HAL_ERROR;
+  if(xTimerStart(config->update_timer, portMAX_DELAY) != pdPASS)
+    return HAL_ERROR;
 
   return HAL_OK;
 }
@@ -170,8 +201,12 @@ static void Task(void *arg)
         }
         else if(bits_set & DISPLAY_EVENT_UPDATE)
         {
+          // update oil and water bar-graph
         	CmdSetBargraphValue(config, Bargraph_Water, DISPLAY_DATA_Racepage.twat > 0 ? DISPLAY_DATA_Racepage.twat : 0, DISPLAY_TIMEOUT);
         	CmdSetBargraphValue(config, Bargraph_Oil, DISPLAY_DATA_Racepage.toil > 0 ? DISPLAY_DATA_Racepage.toil : 0, DISPLAY_TIMEOUT);
+
+        	// update oil and water numeric value
+
         }
         // TODO display stuff if some other bits are set
 
@@ -276,21 +311,41 @@ static HAL_StatusTypeDef SendCommand(DISPLAY_Config_t *config, uint8_t *message,
 
 static HAL_StatusTypeDef CmdShowMacro(DISPLAY_Config_t *config, uint32_t macro_number, TickType_t timeout)
 {
-  static uint8_t buffer[] = {DISPLAY_DC_1, 4, DISPLAY_ESC, 'M', 'N', 0x00, 0x00};
-
-  buffer[5] = macro_number;
+  uint8_t buffer[] = {DISPLAY_DC_1, 4, DISPLAY_ESC, 'M', 'N', macro_number, 0x00};
 
   return SendCommand(config, buffer, 7 , timeout);
 }
 
 static HAL_StatusTypeDef CmdSetBargraphValue(DISPLAY_Config_t *config, uint32_t nr, uint32_t value, TickType_t timeout)
 {
-	static uint8_t buffer[] = {DISPLAY_DC_1, 5, DISPLAY_ESC, 'B', 'A', 0x00, 0x00, 0x00};
-
-	buffer[5] = nr;
-	buffer[6] = value;
+	uint8_t buffer[] = {DISPLAY_DC_1, 5, DISPLAY_ESC, 'B', 'A', nr, value, 0x00};
 
 	return SendCommand(config, buffer, 8 , timeout);
+}
+
+static HAL_StatusTypeDef CmdSetFont(DISPLAY_Config_t *config, uint32_t font_number, TickType_t timeout)
+{
+  uint8_t buffer[] = {DISPLAY_DC_1, 4, DISPLAY_ESC, 'Z', 'F', font_number, 0x00};
+
+  return SendCommand(config, buffer, 7 , timeout);
+}
+
+static HAL_StatusTypeDef CmdSetText(DISPLAY_Config_t *config, Textbox_t *coordintes, TextAlignment_t alignment, uint32_t length, const char *text, TickType_t timeout)
+{
+  uint8_t buffer[11 + length];
+  buffer[0] = DISPLAY_DC_1;
+  buffer[1] = 8 + length;
+  buffer[2] = DISPLAY_ESC;
+  buffer[3] = 'Z';
+  buffer[4] = 'B';
+  buffer[5] = coordintes->x1;
+  buffer[6] = coordintes->y1;
+  buffer[7] = coordintes->x2;
+  buffer[8] = coordintes->y2;
+  buffer[9] = alignment;
+  memcpy(buffer + 10, text, length);
+
+  return SendCommand(config, buffer, 11 + length , timeout);
 }
 
 static void Update(TimerHandle_t xTimer)

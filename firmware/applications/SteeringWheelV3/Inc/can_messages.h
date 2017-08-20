@@ -38,14 +38,6 @@ typedef enum CAN_MO_ID
 
 } CAN_MO_ID_t;
 
-typedef enum CAN_MO_Filter
-{
-	CAN_MO_FILTER_NR_BCM = 0,
-	CAN_MO_FILTER_NR_LVPD,
-	CAN_MO_FILTER_NR_MS4,
-
-} CAN_MO_Filter_t;
-
 typedef struct __attribute__((__packed__)) CAN_MO_SW_Shift
 {
 	uint8_t direction;

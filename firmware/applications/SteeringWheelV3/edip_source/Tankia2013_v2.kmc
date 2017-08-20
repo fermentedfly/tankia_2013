@@ -3,7 +3,9 @@ eDIPTFT32-A "Tankia 2013" ; Projectname" max. 32 character
 
 AutoScan: 1 			; autoscan for correct baud rate to connect to eDIP on COM/USB
 
-COM3: 115200				; program eDIP on COMx with 115200 Baud
+;COM3: 115200				; program eDIP on COMx with 115200 Baud
+COM3: 230400				; program eDIP on COMx with 115200 Baud
+
 ;USB: 230400, "eDIP Programmer"	; use EA 9777-USB eDIP Programmer and program eDIP with 230400 baud
 
 ;VERIFY				; verify after program
@@ -137,21 +139,21 @@ BrownOutMacro:	; runs when supply voltage drops <3V
 	#MN MnInit
 
 ;-------------------------------------------------------------------------------
-Picture 1 <PICS\TUGracing.jpg>	; double click to open
-Picture 4 <PICS\TC_ON.bmp>
-Picture 5 <PICS\TC_OFF.bmp>
-Picture 6 <PICS\CAN_OK.bmp>
-Picture 7 <PICS\CAN_NOK.bmp>
-Picture 8 <PICS\ACC_ON.bmp>
-Picture 9 <PICS\ACC_OFF.bmp>
-Picture 10 <PICS\Bat_OK.bmp>
-Picture 11 <PICS\Bat_NOK.bmp>
-Picture 12 <PICS\Oil_OK.bmp>
-Picture 13 <PICS\Oil_NOK.bmp>
-Picture 14 <PICS\arrow_right.jpg>
-Picture 15 <PICS\arrow_left.jpg>
-Picture 16 <PICS\Tankia2013.bmp>
-Picture 17 <PICS\temp_bad.jpg>
+;Picture 1 <PICS\TUGracing.jpg>	; double click to open
+;Picture 4 <PICS\TC_ON.bmp>
+;Picture 5 <PICS\TC_OFF.bmp>
+;Picture 6 <PICS\CAN_OK.bmp>
+;Picture 7 <PICS\CAN_NOK.bmp>
+;Picture 8 <PICS\ACC_ON.bmp>
+;Picture 9 <PICS\ACC_OFF.bmp>
+;Picture 10 <PICS\Bat_OK.bmp>
+;Picture 11 <PICS\Bat_NOK.bmp>
+;Picture 12 <PICS\Oil_OK.bmp>
+;Picture 13 <PICS\Oil_NOK.bmp>
+;Picture 14 <PICS\arrow_right.jpg>
+;Picture 15 <PICS\arrow_left.jpg>
+;Picture 16 <PICS\Tankia2013.bmp>
+;Picture 17 <PICS\temp_bad.jpg>
 
 ;-------------------------------------------------------------------------------
 Macro: MnInit
@@ -275,6 +277,7 @@ macro: MnRacePage
 	#ZW 1			;Textausgabe: 90°
 	#UW 1			;Bilddarstellung: 90°
 
+	; oil and water values
 	#FR WHITE,WHITE,WHITE
 
 	#ZF 5				;Set Font 5
@@ -289,17 +292,7 @@ macro: MnRacePage
 	#ZZ 1,1
 	#FZ WHITE, TRANSPARENT 	;Set Text Color and Background Color	
 
-	#RE 2,0
-	#RR 280,0,310,80
-	#ZB 282,40,310,80,5,"MP:"
-
-	#RR 280,80,310,160
-	#ZB 282,120,310,160,5,"BKB:"
-
-	#RR 280,160,310,240
-	#ZB 282,200,310,240,5,"TC:"
-
-
+	; gear indicator
 	#FR WHITE,BLACK,WHITE
 	#ZF 13			;Set Font 
 	#FZ GREEN, WHITE 	;Set Text Color and Background Color
@@ -308,20 +301,33 @@ macro: MnRacePage
 	#RE 17,0
 	#RR 35,40,165,200
 
+	; RPM
 	#ZF 5				;Set Font 5
 	#FZ BLACK, TRANSPARENT 	;Set Text Color and Background Color
 	#ZZ 1,1
 
 	#RE 12,0
-	#RR 240,0,275,240
-	#ZB 241,160,275,240,5,"KMH:"
+	#RR 205,0,240,240
+	#ZB 206,160,240,240,5,"RPM:"
 
-	#ZF 5
+	; speed
+	#ZF 5				;Set Font 5
+	#FZ BLACK, TRANSPARENT 	;Set Text Color and Background Color
 	#ZZ 1,1
 
+	#RE 12,0
+	#RR 245,0,280,240
+	#ZB 246,160,280,240,5,"KMH:"
 
-	#ZF 5
+	; blank
+	#ZF 5				;Set Font 5
+	#FZ BLACK, TRANSPARENT 	;Set Text Color and Background Color
 	#ZZ 1,1
+
+	#RE 12,0
+	#RR 285,0,320,240
+	#ZB 286,160,320,240,5,"XXX:"
+
 
 	;Bargraphs
 	#ZF 5				;Set Font 5
@@ -329,20 +335,24 @@ macro: MnRacePage
 	#ZZ 1,1
 
 	#BM 0					; set fill pattern for bargraph (none)
-	#FB GREEN,BLACK,WHITE			; set colour for bargraph pattern, background and frame
+	#FB GREEN,BLACK,WHITE		; set colour for bargraph pattern, background and frame
 						; same as "#FB 4,1,8
 	#BE 118				; set the bargraph frame type
-	#BL BgWater,175,28,35,12,0,110,5		; define bargraph no. 1 with size, value and type
+	#BL BgWater,175,28,35,12,0,110,5	; define bargraph no. 1 with size, value and type
 
 	#BL BgOil,175,228,35,212,0,140,5	; define bargraph no. 1 with size, value and type
 
-	#FZ WHITE, TRANSPARENT 	;Set Text Color and Background Color
+	#FZ WHITE, TRANSPARENT 		;Set Text Color and Background Color
 	#ZB 170,203,200,240,5,"Oil"
 	#ZB 170,0,200,40,5,"Wtr"
 
 	#ZF 5				;Set Font 5
 	#ZZ 1,1
-	#FZ WHITE, TRANSPARENT 	;Set Text Color and Background Color
+	#FZ BLACK, TRANSPARENT 	;Set Text Color and Background Color
+
+	; test water
+	#ZF 6
+	#ZB 1, 5, 30, 50, 2, "test"
 
 
 macro: MnACC
