@@ -115,7 +115,7 @@ static const uint8_t const MenuSize[] = {
 };
 
 static Textbox_t RacepageTextOil = {
-    .x1 = 1, .y1 = 1, .x2 = 50, .y2 = 50
+    .x1 = 1, .y1 = 1, .x2 = 30, .y2 = 20,
 };
 
 static inline HAL_StatusTypeDef SendCommand(DISPLAY_Config_t *config, uint8_t *message, uint32_t length, TickType_t timeout);
@@ -146,8 +146,7 @@ static void Task(void *arg)
 {
   DISPLAY_Config_t *config = (DISPLAY_Config_t *)arg;
 
-  // show main menu initially
-  ShowMenu(config, DISPLAY_MACRO_Main, 0);
+  ShowMenu(config, DISPLAY_MACRO_RacePage, 0);
 
   EventBits_t bits_set = 0;
 

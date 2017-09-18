@@ -69,14 +69,6 @@ typedef struct MAX7313_Config
   I2C_HandleTypeDef *i2c_handle;
   uint16_t i2c_address;
 
-  uint8_t blink_enabled;
-  uint8_t global_intensity_enabled;
-
-  uint8_t master_intensity;
-
-  MAX7313_RegisterContent_PortConfiguration_t port_config;
-  MAX7313_RegisterContent_PortIntensity_t port_intensity;
-
 } MAX7313_Config_t;
 
 typedef enum MAX7313_Register

@@ -132,13 +132,7 @@ void NMI_Handler(void)
 
 void EXTI0_IRQHandler(void)
 {
-  /* USER CODE BEGIN EXTI0_IRQn 0 */
-
-  /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
-  /* USER CODE BEGIN EXTI0_IRQn 1 */
-
-  /* USER CODE END EXTI0_IRQn 1 */
 }
 
 /**
@@ -146,6 +140,7 @@ void EXTI0_IRQHandler(void)
 */
 void EXTI1_IRQHandler(void)
 {
+  NVIC_ClearPendingIRQ(EXTI0_IRQn);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
 }
 
@@ -154,6 +149,7 @@ void EXTI1_IRQHandler(void)
 */
 void EXTI2_IRQHandler(void)
 {
+  NVIC_ClearPendingIRQ(EXTI2_IRQn);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
 }
 
@@ -162,16 +158,16 @@ void EXTI2_IRQHandler(void)
 */
 void EXTI4_IRQHandler(void)
 {
+  NVIC_ClearPendingIRQ(EXTI4_IRQn);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
 }
-
-
 
 /**
 * @brief This function handles EXTI line[9:5] interrupts.
 */
 void EXTI9_5_IRQHandler(void)
 {
+  NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
 }
 
@@ -188,6 +184,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
 */
 void EXTI15_10_IRQHandler(void)
 {
+  NVIC_ClearPendingIRQ(EXTI15_10_IRQn);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
 }
 

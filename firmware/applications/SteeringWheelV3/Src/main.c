@@ -163,46 +163,6 @@ MAX7313_Config_t max7313_config = {
     .i2c_handle = &hi2c1,
     .i2c_address = 0b0100000 << 1,
 
-    .blink_enabled = 0,
-    .global_intensity_enabled = 1,
-    .master_intensity =0, //no PWM
-
-    .port_config = {
-          .port_0 = 0,
-          .port_1 = 0,
-          .port_2 = 0,
-          .port_3 = 0,
-          .port_4 = 0,
-          .port_5 = 0,
-          .port_6 = 0,
-          .port_7 = 0,
-          .port_8  = 0,
-          .port_9  = 0,
-          .port_10 = 0,
-          .port_11 = 0,
-          .port_12 = 1,
-          .port_13 = 1,
-          .port_14 = 1,
-          .port_15 = 1,
-    },
-    .port_intensity = {
-        .port_0 = 0x0,
-        .port_1 = 0x1,
-        .port_2 = 0x2,
-        .port_3 = 0x3,
-        .port_4 = 0x4,
-        .port_5 = 0x5,
-        .port_6 = 0x6,
-        .port_7 = 0x7,
-        .port_8  = 0x8,
-        .port_9  = 0x9,
-        .port_10 = 0xA,
-        .port_11 = 0xB,
-        .port_12 = 0xC,
-        .port_13 = 0xD,
-        .port_14 = 0xE,
-        .port_15 = 0xF,
-    },
 };
 
 DISPLAY_Config_t display_config = {
@@ -248,7 +208,7 @@ int main(void)
   vTaskStartScheduler();
 
   while (1)
-  {
+  {9
   }
 }
 
@@ -384,13 +344,13 @@ static void setupGPIO(void)
 
     // MAX Shift Down, Max Minus
     GPIO_InitStruct.Pin = MAX_SHIFT_DOWN_Pin|MAX_MINUS_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     // MAX Shift Up, Max Plus, Max Enter
     GPIO_InitStruct.Pin = MAX_Shift_Up_Pin|MAX_Plus_Pin|MAX_Enter_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
@@ -402,23 +362,23 @@ static void setupGPIO(void)
 
 
     // EXTI interrupt initialization
-//    HAL_NVIC_SetPriority(EXTI0_IRQn, 7, 0);
-//    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-//
-//    HAL_NVIC_SetPriority(EXTI1_IRQn, 7, 0);
-//    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
-//
-//    HAL_NVIC_SetPriority(EXTI2_IRQn, 7, 0);
-//    HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-//
-//    HAL_NVIC_SetPriority(EXTI4_IRQn, 7, 0);
-//    HAL_NVIC_EnableIRQ(EXTI4_IRQn);
-//
-//    HAL_NVIC_SetPriority(EXTI9_5_IRQn, 7, 0);
-//    HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-//
-//    HAL_NVIC_SetPriority(EXTI15_10_IRQn, 7, 0);
-//    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+    HAL_NVIC_SetPriority(EXTI0_IRQn, 7, 0);
+    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
+    HAL_NVIC_SetPriority(EXTI1_IRQn, 7, 0);
+    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
+    HAL_NVIC_SetPriority(EXTI2_IRQn, 7, 0);
+    HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+
+    HAL_NVIC_SetPriority(EXTI4_IRQn, 7, 0);
+    HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+
+    HAL_NVIC_SetPriority(EXTI9_5_IRQn, 7, 0);
+    HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+    HAL_NVIC_SetPriority(EXTI15_10_IRQn, 7, 0);
+    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 void configureTimerForRunTimeStats(void)
@@ -429,4 +389,33 @@ void configureTimerForRunTimeStats(void)
 unsigned long getRunTimeCounterValue(void)
 {
   return 0;
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  switch(GPIO_Pin)
+  {
+    case MAX_Shift_Up_Pin:
+      // TODO implement
+      break;
+
+    case MAX_Plus_Pin:
+      DISPLAY_DATA_Buttons.plus = pdTRUE;
+      break;
+
+    case MAX_Enter_Pin:
+      DISPLAY_DATA_Buttons.enter = pdTRUE;
+      break;
+
+    case MAX_SHIFT_DOWN_Pin:
+      // TODO implement
+      break;
+
+    case MAX_MINUS_Pin:
+      DISPLAY_DATA_Buttons.minus = pdTRUE;
+      break;
+
+
+  }
+  xEventGroupSetBitsFromISR(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_BUTTON_PRESSED, NULL);
 }
