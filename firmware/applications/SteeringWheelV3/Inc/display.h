@@ -175,12 +175,12 @@ typedef struct DISPLAY_Racepage
 {
   uint8_t traction; // traction control level: 0 - 11
   uint8_t map; // mapping: 1 - 2
-  uint16_t rev;
-  uint8_t ath;
-  uint16_t speed;
+  float rev;
+  float ath;
+  float speed;
   uint8_t gear;
-  int16_t toil;
-  int16_t twat;
+  float toil;
+  float twat;
 
 } DISPLAY_Racepage_t;
 

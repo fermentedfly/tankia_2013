@@ -145,8 +145,8 @@ static void RxCallback(CanRxMsgTypeDef *rxMsg)
       case CAN_MO_ID_MS4_IRA:
       {
         CAN_MO_MS4_IRA_t *msg = (CAN_MO_MS4_IRA_t *)rxMsg->Data;
-        DISPLAY_DATA_Racepage.rev = (msg->rev_msb << 16) + msg->rev_lsb;
-        DISPLAY_DATA_Racepage.ath = msg->ath;
+        DISPLAY_DATA_Racepage.rev = ((((uint32_t)msg->rev_msb) << 8) + msg->rev_lsb) * 0.5;
+        DISPLAY_DATA_Racepage.ath = msg->ath * 100 / 256;
 
         RPM_LEDS_rev = (msg->rev_msb << 16) + msg->rev_lsb;
 

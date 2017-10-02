@@ -208,7 +208,7 @@ int main(void)
   vTaskStartScheduler();
 
   while (1)
-  {9
+  {
   }
 }
 
@@ -396,7 +396,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   switch(GPIO_Pin)
   {
     case MAX_Shift_Up_Pin:
-      // TODO implement
+      CAN_MESSAGES_TransmitSWShift(&hcan1, CAN_MO_SW_Shift_Direction_Up, pdTRUE);
       break;
 
     case MAX_Plus_Pin:
@@ -408,7 +408,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       break;
 
     case MAX_SHIFT_DOWN_Pin:
-      // TODO implement
+      CAN_MESSAGES_TransmitSWShift(&hcan1, CAN_MO_SW_Shift_Direction_Down, pdTRUE);
       break;
 
     case MAX_MINUS_Pin:
