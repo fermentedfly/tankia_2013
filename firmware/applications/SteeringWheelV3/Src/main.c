@@ -18,6 +18,9 @@ void SystemClock_Config(void);
 void MainTask(void *arg);
 static void setupGPIO(void);
 
+#define ADC_MIN 300u
+#define ADC_MAX 3750u
+
 TaskHandle_t SteeringWheelMainTaskHandle;
 
 // http://www.bittiming.can-wiki.info/
@@ -221,7 +224,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* handle)
 {
-  CAN_MESSAGES_TransmitSWClutch(&hcan1, HAL_ADC_GetValue(handle) / 16, pdTRUE); //convert 12Bit ADC to 8Bit Clutch
+  int32_t adc_value = ((int32_t)HAL_ADC_GetValue(handle)) - ADC_MIN;
+
+  if(adc_value < 0)
+    adc_value = 0;
+
+  uint32_t data = adc_value * 0xFF / ADC_MAX;
+
+  if(data > 0xFF)
+    data = 0xFF;
+
+  CAN_MESSAGES_TransmitSWClutch(&hcan1,  data, pdTRUE); //convert 12Bit ADC to 8Bit Clutch
 }
 
 void MainTask(void *arg)
