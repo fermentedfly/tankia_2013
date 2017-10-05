@@ -234,7 +234,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* handle)
   if(data > 0xFF)
     data = 0xFF;
 
-  CAN_MESSAGES_TransmitSWClutch(&hcan1,  data, pdTRUE); //convert 12Bit ADC to 8Bit Clutch
+  CAN_MESSAGES_TransmitSWClutch(&hcan1,  0xFF - data, pdTRUE); //convert 12Bit ADC to 8Bit Clutch
 }
 
 void MainTask(void *arg)
@@ -248,7 +248,7 @@ void MainTask(void *arg)
   vTaskDelay(100);
 
   CAN_MESSAGES_Init(&hcan1);
-  configASSERT(RPM_LEDS_Init(&max7313_config) == HAL_OK);
+  //configASSERT(RPM_LEDS_Init(&max7313_config) == HAL_OK);
   configASSERT(DISPLAY_Init(&display_config) == HAL_OK);
   configASSERT(ADC_StartContinousConversion(&hadc1, 100) == HAL_OK);
 
