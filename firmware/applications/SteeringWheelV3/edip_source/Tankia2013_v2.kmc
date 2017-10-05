@@ -350,10 +350,6 @@ macro: MnRacePage
 	#ZZ 1,1
 	#FZ BLACK, TRANSPARENT 	;Set Text Color and Background Color
 
-	; test water
-	#ZF 6
-	#ZB 1, 5, 30, 50, 2, "test"
-
 
 macro: MnACC
 	#TC 0				; Cursor invisible

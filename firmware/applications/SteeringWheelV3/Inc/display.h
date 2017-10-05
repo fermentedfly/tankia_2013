@@ -179,8 +179,8 @@ typedef struct DISPLAY_Racepage
   float ath;
   float speed;
   uint8_t gear;
-  float toil;
-  float twat;
+  int16_t toil;
+  int16_t twat;
 
 } DISPLAY_Racepage_t;
 

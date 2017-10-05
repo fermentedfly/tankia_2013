@@ -71,8 +71,6 @@ static void RxCallback(CanRxMsgTypeDef *rxMsg)
 
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
 
-  portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-
   switch(rxMsg->StdId)
     {
       case CAN_MO_ID_BCM_SETUP_CONFIRM_1:
@@ -181,8 +179,6 @@ static void RxCallback(CanRxMsgTypeDef *rxMsg)
         break;
       }
     };
-
-  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
 }

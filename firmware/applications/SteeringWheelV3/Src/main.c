@@ -250,7 +250,7 @@ void MainTask(void *arg)
   CAN_MESSAGES_Init(&hcan1);
   configASSERT(RPM_LEDS_Init(&max7313_config) == HAL_OK);
   configASSERT(DISPLAY_Init(&display_config) == HAL_OK);
-  configASSERT(ADC_StartContinousConversion(&hadc1, 500) == HAL_OK);
+  configASSERT(ADC_StartContinousConversion(&hadc1, 100) == HAL_OK);
 
   uint8_t buffer = 0x00;
   uint32_t bytes_read;

@@ -31,34 +31,26 @@ static void TxTask(void *arg);
 
 void CAN1_TX_IRQHandler(void)
 {
-  traceISR_ENTER();
   HAL_NVIC_ClearPendingIRQ(CAN1_TX_IRQn);
   HAL_CAN_IRQHandler(CAN1_Config.Handle);
-  traceISR_EXIT();
 }
 
 void CAN1_RX0_IRQHandler(void)
 {
-  traceISR_ENTER();
   HAL_NVIC_ClearPendingIRQ(CAN1_RX0_IRQn);
   CAN_RX_IRQHandler(&CAN1_Config, CAN_FIFO0);
-  traceISR_EXIT();
 }
 
 void CAN1_RX1_IRQHandler(void)
 {
-  traceISR_ENTER();
   HAL_NVIC_ClearPendingIRQ(CAN1_RX1_IRQn);
   CAN_RX_IRQHandler(&CAN1_Config, CAN_FIFO1);
-  traceISR_EXIT();
 }
 
 void CAN1_SCE_IRQHandler(void)
 {
-  traceISR_ENTER();
   HAL_NVIC_ClearPendingIRQ(CAN1_SCE_IRQn);
   HAL_CAN_IRQHandler(CAN1_Config.Handle);
-  traceISR_EXIT();
 }
 
 static void CAN_RX_IRQHandler(CAN_Config_t *config, uint32_t FIFONumber)

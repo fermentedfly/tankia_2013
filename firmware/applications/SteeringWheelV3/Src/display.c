@@ -120,8 +120,12 @@ static const uint8_t const MenuSize[] = {
     [DISPLAY_MACRO_ClutchNormal] = 5,
 };
 
+static Textbox_t RacepageTextWater = {
+    .x1 = 1, .y1 = 5, .x2 = 30, .y2 = 120,
+};
+
 static Textbox_t RacepageTextOil = {
-    .x1 = 1, .y1 = 1, .x2 = 30, .y2 = 20,
+    .x1 = 1, .y1 = 120, .x2 = 30, .y2 = 235,
 };
 
 static Textbox_t RacepageTextRPM  = {
@@ -228,7 +232,15 @@ static void Task(void *arg)
         	CmdSetBargraphValue(config, Bargraph_Water, DISPLAY_DATA_Racepage.twat > 0 ? DISPLAY_DATA_Racepage.twat : 0, DISPLAY_TIMEOUT);
         	CmdSetBargraphValue(config, Bargraph_Oil, DISPLAY_DATA_Racepage.toil > 0 ? DISPLAY_DATA_Racepage.toil : 0, DISPLAY_TIMEOUT);
 
-        	// TODO update oil and water numeric value
+        	// show water temperature
+        	char water_buffer[20];
+        	uint32_t water_length = snprintf(water_buffer, 20, "%d", DISPLAY_DATA_Racepage.twat);
+        	CmdSetText(config, &RacepageTextWater, TextAlignment_MiddleRight, water_length + 1, water_buffer, DISPLAY_TIMEOUT);
+
+          // show oil temperature
+          char oil_buffer[20];
+          uint32_t oil_length = snprintf(oil_buffer, 20, "%d", DISPLAY_DATA_Racepage.toil);
+          CmdSetText(config, &RacepageTextOil, TextAlignment_MiddleLeft, oil_length + 1, oil_buffer, DISPLAY_TIMEOUT);
 
         	// show RPM
         	char rpm_buffer[20];
