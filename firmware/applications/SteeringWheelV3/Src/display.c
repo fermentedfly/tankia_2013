@@ -229,25 +229,25 @@ static void Task(void *arg)
           CmdSetFontZoom(config, 2, 2, DISPLAY_TIMEOUT);
 
           // update oil and water bar-graph
-        	CmdSetBargraphValue(config, Bargraph_Water, DISPLAY_DATA_Racepage.twat > 0 ? DISPLAY_DATA_Racepage.twat : 0, DISPLAY_TIMEOUT);
-        	CmdSetBargraphValue(config, Bargraph_Oil, DISPLAY_DATA_Racepage.toil > 0 ? DISPLAY_DATA_Racepage.toil : 0, DISPLAY_TIMEOUT);
+		  CmdSetBargraphValue(config, Bargraph_Water, DISPLAY_DATA_Racepage.twat > 0 ? DISPLAY_DATA_Racepage.twat : 0, DISPLAY_TIMEOUT);
+		  CmdSetBargraphValue(config, Bargraph_Oil, DISPLAY_DATA_Racepage.toil > 0 ? DISPLAY_DATA_Racepage.toil : 0, DISPLAY_TIMEOUT);
 
-        	// show water temperature
-        	char water_buffer[20];
-        	uint32_t water_length = snprintf(water_buffer, 20, "%d", DISPLAY_DATA_Racepage.twat);
-        	CmdSetText(config, &RacepageTextWater, TextAlignment_MiddleRight, water_length + 1, water_buffer, DISPLAY_TIMEOUT);
+          // show water temperature
+          char water_buffer[20];
+          uint32_t water_length = snprintf(water_buffer, 20, "%d", DISPLAY_DATA_Racepage.twat);
+          CmdSetText(config, &RacepageTextWater, TextAlignment_MiddleRight, water_length + 1, water_buffer, DISPLAY_TIMEOUT);
 
           // show oil temperature
           char oil_buffer[20];
           uint32_t oil_length = snprintf(oil_buffer, 20, "%d", DISPLAY_DATA_Racepage.toil);
           CmdSetText(config, &RacepageTextOil, TextAlignment_MiddleLeft, oil_length + 1, oil_buffer, DISPLAY_TIMEOUT);
 
-        	// show RPM
-        	char rpm_buffer[20];
-        	uint32_t rpm_length = snprintf(rpm_buffer, 20, "%.1f", DISPLAY_DATA_Racepage.rev);
-        	CmdSetText(config, &RacepageTextRPM, TextAlignment_MiddleRight, rpm_length + 1, rpm_buffer, DISPLAY_TIMEOUT);
+          // show RPM
+          char rpm_buffer[20];
+          uint32_t rpm_length = snprintf(rpm_buffer, 20, "%.1f", DISPLAY_DATA_Racepage.rev);
+          CmdSetText(config, &RacepageTextRPM, TextAlignment_MiddleRight, rpm_length + 1, rpm_buffer, DISPLAY_TIMEOUT);
 
-        	// show speed
+          // show speed
           char speed_buffer[20];
           uint32_t speed_length = snprintf(speed_buffer, 20, "%.1f", DISPLAY_DATA_Racepage.speed);
           CmdSetText(config, &RacepageTextSpeed, TextAlignment_MiddleRight, speed_length + 1, speed_buffer, DISPLAY_TIMEOUT);

@@ -154,7 +154,7 @@ static void RxCallback(CanRxMsgTypeDef *rxMsg)
       case CAN_MO_ID_MS4_SPEED:
       {
         CAN_MO_MS4_Speed_t *msg = (CAN_MO_MS4_Speed_t *)rxMsg->Data;
-        DISPLAY_DATA_Racepage.speed = (msg->speed_msb << 16) + msg->speed_lsb;
+        DISPLAY_DATA_Racepage.speed = ((((uint32_t)msg->speed_msb) << 8) + msg->speed_lsb) * 512 / 65536;
 
         break;
       }
