@@ -2,6 +2,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "string.h"
+#include "can_messages.h"
 
 typedef enum BargraphsNr
 {
@@ -140,6 +141,8 @@ static Textbox_t RacepageTextEmpty  = {
     .x1 = 288, .y1 = 50, .x2 = 316, .y2 = 150,
 };
 
+extern CAN_HandleTypeDef hcan1;
+
 static HAL_StatusTypeDef SendCommand(DISPLAY_Config_t *config, uint8_t *message, uint32_t length, TickType_t timeout);
 static HAL_StatusTypeDef CmdShowMacro(DISPLAY_Config_t *config, uint32_t macro_number, TickType_t timeout);
 static HAL_StatusTypeDef CmdSetBargraphValue(DISPLAY_Config_t *config, uint32_t nr, uint32_t value, TickType_t timeout);
@@ -214,12 +217,12 @@ static void Task(void *arg)
           }
           else if(DISPLAY_DATA_Buttons.plus)
           {
-            // TODO Shift UP
+        	  CAN_MESSAGES_TransmitSWShift(&hcan1, CAN_MO_SW_Shift_Direction_Up, pdTRUE);
           }
 
           else if(DISPLAY_DATA_Buttons.minus)
           {
-            // TODO Shift DOWN
+        	  CAN_MESSAGES_TransmitSWShift(&hcan1, CAN_MO_SW_Shift_Direction_Down, pdTRUE);
           }
         }
         else if(bits_set & DISPLAY_EVENT_UPDATE)
