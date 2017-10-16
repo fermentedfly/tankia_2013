@@ -252,35 +252,13 @@ void MainTask(void *arg)
   configASSERT(DISPLAY_Init(&display_config) == HAL_OK);
   configASSERT(ADC_StartContinousConversion(&hadc1, 100) == HAL_OK);
 
-  uint8_t buffer = 0x00;
-  uint32_t bytes_read;
+//  configASSERT(VCP_FORWARD_Init(&vcp_forward_config) == HAL_OK);
+//  vTaskDelay(1000);
+//  VCP_FORWARD_Enable(&vcp_forward_config);
 
-  while(1)
+  while (1)
   {
-    USB_VCP_readBlocking(&USB_Config, &buffer, sizeof(buffer), &bytes_read, portMAX_DELAY);
 
-    if(buffer == 'x')
-    {
-      configASSERT(VCP_FORWARD_Init(&vcp_forward_config) == HAL_OK);
-      vTaskDelay(1000);
-      VCP_FORWARD_Enable(&vcp_forward_config);
-
-      while (1)
-      {
-
-      }
-    }
-
-    if(buffer == 'p')
-      DISPLAY_DATA_Buttons.plus = pdTRUE;
-
-    else if(buffer == 'm')
-      DISPLAY_DATA_Buttons.minus = pdTRUE;
-
-    else if(buffer == 'e')
-      DISPLAY_DATA_Buttons.enter = pdTRUE;
-
-    xEventGroupSetBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_BUTTON_PRESSED);
   }
 }
 

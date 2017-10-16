@@ -1,7 +1,7 @@
 eDIPTFT32-A "Tankia 2013" ; Projectname" max. 32 character
 
 
-AutoScan: 1 			; autoscan for correct baud rate to connect to eDIP on COM/USB
+AutoScan: 0 			; autoscan for correct baud rate to connect to eDIP on COM/USB
 
 ;COM3: 115200				; program eDIP on COMx with 115200 Baud
 COM3: 230400				; program eDIP on COMx with 115200 Baud
@@ -211,22 +211,20 @@ Macro MnPageInv_7
 	#RI 290,95,310,225
 
 Macro MnPageValue_2
-	#RI 140,43,160,78
+	#GR 138,41,162,80
 
 Macro MnPageValue_3
-	#RI 170,43,190,78
+	#GR 168,41,192,80
 
 Macro MnPageValue_4
-	#RI 200,43,220,78
+	#GR 198,41,222,80
 
 Macro MnPageValue_5
-	#RI 230,43,250,78
+	#GR 228,41,252,80
 
 Macro MnPageValue_6
-	#RI 260,43,280,78
+	#GR 258,41,282,80
 
-Macro MnPageValue_7
-	#RI 200,43,310,78
 
 Macro MnHeader
 	#TC 0				; Cursor invisible

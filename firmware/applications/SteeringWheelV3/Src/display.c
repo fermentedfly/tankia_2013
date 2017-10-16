@@ -26,7 +26,9 @@ typedef enum TextAlignment
 
 typedef enum Color
 {
+  Color_Transparent = 0,
   Color_Black = 1,
+  Color_Red = 3,
   Color_White = 8,
 } Color_t;
 
@@ -141,6 +143,22 @@ static Textbox_t RacepageTextEmpty  = {
     .x1 = 288, .y1 = 50, .x2 = 316, .y2 = 150,
 };
 
+static Textbox_t MenuTextValue_2 = {
+    .x1 = 140, .y1 = 43, .x2 = 160, .y2= 78
+};
+
+static Textbox_t MenuTextValue_3 = {
+    .x1 = 170, .y1 = 43, .x2 = 190, .y2= 78
+};
+
+static Textbox_t MenuTextValue_4 = {
+    .x1 = 200, .y1 = 43, .x2 = 220, .y2= 78
+};
+
+static Textbox_t MenuTextValue_5 = {
+    .x1 = 230, .y1 = 43, .x2 = 250, .y2= 78
+};
+
 extern CAN_HandleTypeDef hcan1;
 
 static HAL_StatusTypeDef SendCommand(DISPLAY_Config_t *config, uint8_t *message, uint32_t length, TickType_t timeout);
@@ -148,6 +166,7 @@ static HAL_StatusTypeDef CmdShowMacro(DISPLAY_Config_t *config, uint32_t macro_n
 static HAL_StatusTypeDef CmdSetBargraphValue(DISPLAY_Config_t *config, uint32_t nr, uint32_t value, TickType_t timeout);
 static HAL_StatusTypeDef CmdSetFont(DISPLAY_Config_t *config, uint32_t font_number, TickType_t timeout);
 static HAL_StatusTypeDef CmdSetFontZoom(DISPLAY_Config_t *config, uint32_t zoom_x, uint32_t zoom_y, TickType_t timeout);
+static HAL_StatusTypeDef CmdSetLineColor(DISPLAY_Config_t *config, uint32_t color_fg, uint32_t color_bg, TickType_t timeout);
 static HAL_StatusTypeDef CmdSetTextColor(DISPLAY_Config_t *config, uint32_t color_fg, uint32_t color_bg, TickType_t timeout);
 static HAL_StatusTypeDef CmdSetText(DISPLAY_Config_t *config, Textbox_t *coordintes, TextAlignment_t alignment, uint32_t length, const char *text, TickType_t timeout);
 static void Task(void *arg);
@@ -232,8 +251,8 @@ static void Task(void *arg)
           CmdSetFontZoom(config, 2, 2, DISPLAY_TIMEOUT);
 
           // update oil and water bar-graph
-		  CmdSetBargraphValue(config, Bargraph_Water, DISPLAY_DATA_Racepage.twat > 0 ? DISPLAY_DATA_Racepage.twat : 0, DISPLAY_TIMEOUT);
-		  CmdSetBargraphValue(config, Bargraph_Oil, DISPLAY_DATA_Racepage.toil > 0 ? DISPLAY_DATA_Racepage.toil : 0, DISPLAY_TIMEOUT);
+          CmdSetBargraphValue(config, Bargraph_Water, DISPLAY_DATA_Racepage.twat > 0 ? DISPLAY_DATA_Racepage.twat : 0, DISPLAY_TIMEOUT);
+          CmdSetBargraphValue(config, Bargraph_Oil, DISPLAY_DATA_Racepage.toil > 0 ? DISPLAY_DATA_Racepage.toil : 0, DISPLAY_TIMEOUT);
 
           // show water temperature
           char water_buffer[20];
@@ -258,11 +277,7 @@ static void Task(void *arg)
           // show testing value
           CmdSetText(config, &RacepageTextEmpty, TextAlignment_MiddleRight, 6, "empty", DISPLAY_TIMEOUT);
 
-
-
         }
-        // TODO display stuff if some other bits are set
-
         break;
 
       case DISPLAY_MACRO_ECU:
@@ -305,21 +320,43 @@ static void Task(void *arg)
 
         bits_set = xEventGroupWaitBits(DISPLAY_NewDataEventHandle, DISPLAY_EVENT_UPDATE | DISPLAY_EVENT_BUTTON_PRESSED, pdTRUE, pdFALSE, portMAX_DELAY);
 
+        // Show Values
+        CmdSetFontZoom(config, 1, 1, DISPLAY_TIMEOUT);
+        CmdSetTextColor(config, Color_White, Color_Black, DISPLAY_TIMEOUT);
+
+        char buffer[20];
+        uint32_t length = 0;
+
+        length = snprintf(buffer, 20, "%x", DISPLAY_DATA_ClutchNormal.clutch_points);
+        CmdSetText(config, &MenuTextValue_2, TextAlignment_MiddleLeft, length + 1, buffer, DISPLAY_TIMEOUT);
+
+        length = snprintf(buffer, 20, "%x", DISPLAY_DATA_ClutchNormal.clutch_tolerance);
+        CmdSetText(config, &MenuTextValue_3, TextAlignment_MiddleLeft, length + 1, buffer, DISPLAY_TIMEOUT);
+
+        length = snprintf(buffer, 20, "%x", DISPLAY_DATA_ClutchNormal.c_sens_min);
+        CmdSetText(config, &MenuTextValue_4, TextAlignment_MiddleLeft, length + 1, buffer, DISPLAY_TIMEOUT);
+
+        length = snprintf(buffer, 20, "%x", DISPLAY_DATA_ClutchNormal.c_sens_min);
+        CmdSetText(config, &MenuTextValue_5, TextAlignment_MiddleLeft, length + 1, buffer, DISPLAY_TIMEOUT);
+
+        if(config->edit_mode)
+          CmdShowMacro(config, DISPLAY_MACRO_PageValue_1 + config->menu_position, DISPLAY_TIMEOUT);
+
         if(bits_set & DISPLAY_EVENT_BUTTON_PRESSED)
         {
           if(DISPLAY_DATA_Buttons.enter)
           {
             if(config->menu_position == 0)
-            {
               ShowMenu(config, MenuMapper[config->current_menu][config->menu_position], 0);
-            }
             else
-            {
-              // toggle edit mode
               config->edit_mode = !config->edit_mode;
-              CmdShowMacro(config, DISPLAY_MACRO_PageInv_1 + config->menu_position, DISPLAY_TIMEOUT);
-              CmdShowMacro(config, DISPLAY_MACRO_PageValue_1 + config->menu_position, DISPLAY_TIMEOUT);
-            }
+
+            // set line color depending on whether edit mode has been entered or exited
+            CmdSetLineColor(config, config->edit_mode ? Color_Red : Color_Black, Color_Transparent, DISPLAY_TIMEOUT);
+
+            // toggle edit mode
+            CmdShowMacro(config, DISPLAY_MACRO_PageInv_1 + config->menu_position, DISPLAY_TIMEOUT);
+            CmdShowMacro(config, DISPLAY_MACRO_PageValue_1 + config->menu_position, DISPLAY_TIMEOUT);
           }
           if(config->edit_mode)
           {
@@ -396,6 +433,14 @@ static HAL_StatusTypeDef CmdSetTextColor(DISPLAY_Config_t *config, uint32_t colo
 
   return SendCommand(config, buffer, 8 , timeout);
 }
+
+static HAL_StatusTypeDef CmdSetLineColor(DISPLAY_Config_t *config, uint32_t color_fg, uint32_t color_bg, TickType_t timeout)
+{
+  uint8_t buffer[] = {DISPLAY_DC_1, 5, DISPLAY_ESC, 'F', 'G', color_fg, color_bg, 0x00};
+
+  return SendCommand(config, buffer, 8 , timeout);
+}
+
 
 static HAL_StatusTypeDef CmdSetText(DISPLAY_Config_t *config, Textbox_t *coordintes, TextAlignment_t alignment, uint32_t length, const char *text, TickType_t timeout)
 {
