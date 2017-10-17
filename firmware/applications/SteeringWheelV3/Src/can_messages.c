@@ -65,6 +65,24 @@ void CAN_MESSAGES_TransmitSWClutch(CAN_HandleTypeDef* hcan, uint8_t value, uint8
 	CAN_Transmit(hcan, &msg, fromISR);
 }
 
+void CAN_MESSAGES_TransmitBCM1(CAN_HandleTypeDef* hcan, uint8_t data_select, uint8_t clutch_points, uint8_t clutch_tolerance, uint16_t c_min, uint16_t c_max, uint8_t fromISR)
+{
+  static CanTxMsgTypeDef msg = {
+      .StdId = CAN_MO_ID_BCM_SETUP_1,
+      .IDE = CAN_ID_STD,
+      .RTR = CAN_RTR_DATA,
+      .DLC = sizeof(CAN_MO_BCM_Setup_1_t),
+  };
+
+  ((CAN_MO_BCM_Setup_1_t *)msg.Data)->data_select = data_select;
+  ((CAN_MO_BCM_Setup_1_t *)msg.Data)->clutch_points = clutch_points;
+  ((CAN_MO_BCM_Setup_1_t *)msg.Data)->clutch_tolerance = clutch_tolerance;
+  ((CAN_MO_BCM_Setup_1_t *)msg.Data)->c_sens_min = c_min;
+  ((CAN_MO_BCM_Setup_1_t *)msg.Data)->c_sens_max = c_max;
+
+  CAN_Transmit(hcan, &msg, fromISR);
+}
+
 static void RxCallback(CanRxMsgTypeDef *rxMsg)
 {
   configASSERT(rxMsg->IDE == CAN_ID_STD);

@@ -360,7 +360,23 @@ static void Task(void *arg)
           }
           if(config->edit_mode)
           {
+            int8_t increment = DISPLAY_DATA_Buttons.plus ? 1 : 0 + DISPLAY_DATA_Buttons.minus ? -1 : 0;
 
+            switch(config->menu_position)
+            {
+            case 1:
+              CAN_MESSAGES_TransmitBCM1(&hcan1, 0x01, DISPLAY_DATA_ClutchNormal.clutch_points + increment, 0, 0, 0, pdFALSE);
+              break;
+            case 2:
+              CAN_MESSAGES_TransmitBCM1(&hcan1, 0x02, 0, DISPLAY_DATA_ClutchNormal.clutch_tolerance + increment, 0, 0, pdFALSE);
+              break;
+            case 3:
+              CAN_MESSAGES_TransmitBCM1(&hcan1, 0x04, 0, 0, DISPLAY_DATA_ClutchNormal.c_sens_min + increment, 0, pdFALSE);
+              break;
+            case 4:
+              CAN_MESSAGES_TransmitBCM1(&hcan1, 0x08, 0, 0, 0, DISPLAY_DATA_ClutchNormal.c_sens_max + increment, pdFALSE);
+              break;
+            }
           }
           else
           {

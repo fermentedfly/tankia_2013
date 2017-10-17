@@ -18,6 +18,12 @@ typedef enum CAN_MO_ID
 {
 	CAN_MO_ID_SW_SHIFT 				= 0x11,
 	CAN_MO_ID_SW_CLUTCH 			= 0x10,
+
+	CAN_MO_ID_BCM_SETUP_1 = 0x100,
+	CAN_MO_ID_BCM_SETUP_2 = 0x101,
+	CAN_MO_ID_BCM_SETUP_3 = 0x102,
+	CAN_MO_ID_BCM_SETUP_4 = 0x103,
+
 	CAN_MO_ID_BCM_SETUP_CONFIRM_1   = 0x200,
 	CAN_MO_ID_BCM_SETUP_CONFIRM_2   = 0x201,
 	CAN_MO_ID_BCM_SETUP_CONFIRM_3   = 0x202,
@@ -229,5 +235,6 @@ typedef struct __attribute__((__packed__)) CAN_MO_MS4_SBDB
 void CAN_MESSAGES_Init(CAN_HandleTypeDef* hcan);
 void CAN_MESSAGES_TransmitSWShift(CAN_HandleTypeDef* hcan, CAN_MO_SW_Shift_Direction_t direction, uint8_t fromISR);
 void CAN_MESSAGES_TransmitSWClutch(CAN_HandleTypeDef* hcan, uint8_t value, uint8_t fromISR);
+void CAN_MESSAGES_TransmitBCM1(CAN_HandleTypeDef* hcan, uint8_t data_select, uint8_t clutch_points, uint8_t clutch_tolerance, uint16_t c_min, uint16_t c_max, uint8_t fromISR);
 
 #endif /* INC_CAN_MESSAGES_H_ */
