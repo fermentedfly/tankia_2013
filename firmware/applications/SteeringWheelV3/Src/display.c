@@ -336,7 +336,7 @@ static void Task(void *arg)
         length = snprintf(buffer, 20, "%x", DISPLAY_DATA_ClutchNormal.c_sens_min);
         CmdSetText(config, &MenuTextValue_4, TextAlignment_MiddleLeft, length + 1, buffer, DISPLAY_TIMEOUT);
 
-        length = snprintf(buffer, 20, "%x", DISPLAY_DATA_ClutchNormal.c_sens_min);
+        length = snprintf(buffer, 20, "%x", DISPLAY_DATA_ClutchNormal.c_sens_max);
         CmdSetText(config, &MenuTextValue_5, TextAlignment_MiddleLeft, length + 1, buffer, DISPLAY_TIMEOUT);
 
         if(config->edit_mode)

@@ -12,9 +12,11 @@
 
 typedef struct CAN_Config
 {
-  TaskHandle_t RxTaskHandle;
+
   CAN_HandleTypeDef *Handle;
-  QueueHandle_t RxQueue;
+
+//  TaskHandle_t RxTaskHandle;
+//  QueueHandle_t RxQueue;
   CAN_rxCallback RxCallback;
 
   QueueHandle_t TxQueue;
@@ -26,7 +28,7 @@ typedef struct CAN_Config
 static CAN_Config_t CAN1_Config;
 
 static void CAN_RX_IRQHandler(CAN_Config_t *config, uint32_t FIFONumber);
-static void RxTask(void *arg);
+//static void RxTask(void *arg);
 static void TxTask(void *arg);
 
 void CAN1_TX_IRQHandler(void)
@@ -76,9 +78,13 @@ static void CAN_RX_IRQHandler(CAN_Config_t *config, uint32_t FIFONumber)
   __HAL_CAN_FIFO_RELEASE(config->Handle, FIFONumber);
 
   // send data for further processing to task
-  BaseType_t xHigherPriorityTaskWoken;
-  xQueueSendToBackFromISR(config->RxQueue, &rxMsg, &xHigherPriorityTaskWoken);
-  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+  //BaseType_t xHigherPriorityTaskWoken;
+  //configASSERT(xQueueSendToBackFromISR(config->RxQueue, &rxMsg, &xHigherPriorityTaskWoken) == pdTRUE);
+  //portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+  if(config->RxCallback != NULL)
+        config->RxCallback(&rxMsg);
+
 }
 
 void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
@@ -102,8 +108,8 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* hcan)
 
     CAN1_Config.Handle = hcan;
 
-    configASSERT((CAN1_Config.RxQueue = xQueueCreate(20, sizeof(CanRxMsgTypeDef))) != NULL);
-    configASSERT(xTaskCreate(RxTask, "CAN1 RX", RX_TASK_STACK_SIZE, &CAN1_Config, tskIDLE_PRIORITY + 2, &CAN1_Config.RxTaskHandle) == pdPASS);
+    //    configASSERT((CAN1_Config.RxQueue = xQueueCreate(50, sizeof(CanRxMsgTypeDef))) != NULL);
+//    configASSERT(xTaskCreate(RxTask, "CAN1 RX", RX_TASK_STACK_SIZE, &CAN1_Config, tskIDLE_PRIORITY + 2, &CAN1_Config.RxTaskHandle) == pdPASS);
 
     configASSERT((CAN1_Config.TxQueue = xQueueCreate(20, sizeof(CanTxMsgTypeDef))) != NULL);
     configASSERT((CAN1_Config.TxDoneSignal = xSemaphoreCreateBinary()) != NULL);
@@ -185,18 +191,18 @@ void CAN_Transmit(CAN_HandleTypeDef* hcan, CanTxMsgTypeDef *tx_msg, uint8_t from
   }
 }
 
-static void RxTask(void *arg)
-{
-  CAN_Config_t *config = (CAN_Config_t *)arg;
-
-  while(1)
-  {
-    CanRxMsgTypeDef rxmsg;
-    xQueueReceive(config->RxQueue, &rxmsg, portMAX_DELAY);
-    if(config->RxCallback != NULL)
-      config->RxCallback(&rxmsg);
-  }
-}
+//static void RxTask(void *arg)
+//{
+//  CAN_Config_t *config = (CAN_Config_t *)arg;
+//
+//  while(1)
+//  {
+//    CanRxMsgTypeDef rxmsg;
+//    xQueueReceive(config->RxQueue, &rxmsg, portMAX_DELAY);
+//    if(config->RxCallback != NULL)
+//      config->RxCallback(&rxmsg);
+//  }
+//}
 
 static void TxTask(void *arg)
 {
