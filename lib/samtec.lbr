@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.3">
+<eagle version="6.6.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -154,6 +154,37 @@
 <hole x="1.905" y="0" drill="1"/>
 <hole x="-1.905" y="0" drill="1"/>
 </package>
+<package name="FTSH-105-XX-XXX-DH">
+<wire x1="-3.175" y1="1.2573" x2="1.27" y2="1.2573" width="0.127" layer="51"/>
+<wire x1="1.27" y1="1.2573" x2="2.54" y2="1.2573" width="0.127" layer="51"/>
+<wire x1="2.54" y1="1.2573" x2="3.175" y2="1.2573" width="0.127" layer="51"/>
+<wire x1="3.175" y1="1.2573" x2="3.175" y2="-1.2573" width="0.127" layer="51"/>
+<wire x1="3.175" y1="-1.2573" x2="-3.175" y2="-1.2573" width="0.127" layer="51"/>
+<wire x1="-3.175" y1="-1.2573" x2="-3.175" y2="1.2573" width="0.127" layer="51"/>
+<wire x1="2.54" y1="1.2573" x2="2.54" y2="4.3053" width="0.127" layer="51"/>
+<wire x1="1.27" y1="1.2573" x2="1.27" y2="4.3053" width="0.127" layer="51"/>
+<wire x1="0" y1="1.2573" x2="0" y2="4.3053" width="0.127" layer="51"/>
+<wire x1="-1.27" y1="1.2573" x2="-1.27" y2="4.3053" width="0.127" layer="51"/>
+<wire x1="-2.54" y1="1.2573" x2="-2.54" y2="4.3053" width="0.127" layer="51"/>
+<wire x1="3.683" y1="4.8133" x2="3.683" y2="-7.239" width="0.127" layer="21"/>
+<wire x1="3.683" y1="-7.239" x2="-3.683" y2="-7.239" width="0.127" layer="21"/>
+<wire x1="-3.683" y1="-7.239" x2="-3.683" y2="4.8133" width="0.127" layer="21"/>
+<wire x1="-3.683" y1="4.8133" x2="3.683" y2="4.8133" width="0.127" layer="21"/>
+<smd name="1" x="2.54" y="-2.794" dx="0.762" dy="2.032" layer="1"/>
+<smd name="2" x="2.54" y="-5.842" dx="0.762" dy="2.032" layer="1"/>
+<smd name="3" x="1.27" y="-2.794" dx="0.762" dy="2.032" layer="1"/>
+<smd name="4" x="1.27" y="-5.842" dx="0.762" dy="2.032" layer="1"/>
+<smd name="5" x="0" y="-2.794" dx="0.762" dy="2.032" layer="1"/>
+<smd name="6" x="0" y="-5.842" dx="0.762" dy="2.032" layer="1"/>
+<smd name="7" x="-1.27" y="-2.794" dx="0.762" dy="2.032" layer="1"/>
+<smd name="8" x="-1.27" y="-5.842" dx="0.762" dy="2.032" layer="1"/>
+<smd name="9" x="-2.54" y="-2.794" dx="0.762" dy="2.032" layer="1"/>
+<smd name="10" x="-2.54" y="-5.842" dx="0.762" dy="2.032" layer="1"/>
+<text x="-3.302" y="-8.636" size="1.016" layer="25">&gt;NAME</text>
+<text x="-3.81" y="5.08" size="1.016" layer="27">&gt;VALUE</text>
+<text x="3.81" y="-3.302" size="1.27" layer="21">1</text>
+<text x="3.81" y="-6.604" size="1.27" layer="21">2</text>
+</package>
 </packages>
 <symbols>
 <symbol name="5X2">
@@ -176,12 +207,12 @@
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="FTSH-105-01-*-DV-K" prefix="J">
+<deviceset name="FTSH-105-XX-X-" prefix="J">
 <gates>
 <gate name="G$1" symbol="5X2" x="0" y="0"/>
 </gates>
 <devices>
-<device name="" package="FTSH-105-01-XXX-DV-K">
+<device name="DV" package="FTSH-105-01-XXX-DV-K">
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="10" pad="10"/>
@@ -194,12 +225,8 @@
 <connect gate="G$1" pin="8" pad="8"/>
 <connect gate="G$1" pin="9" pad="9"/>
 </connects>
-<technologies>
-<technology name="F"/>
-<technology name="L"/>
-</technologies>
 </device>
-<device name="-A" package="FTSH-105-01-XXX-DV-K-A">
+<device name="DV-A" package="FTSH-105-01-XXX-DV-K-A">
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="10" pad="10"/>
@@ -212,10 +239,20 @@
 <connect gate="G$1" pin="8" pad="8"/>
 <connect gate="G$1" pin="9" pad="9"/>
 </connects>
-<technologies>
-<technology name="F"/>
-<technology name="L"/>
-</technologies>
+</device>
+<device name="DH" package="FTSH-105-XX-XXX-DH">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="10" pad="10"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
+<connect gate="G$1" pin="4" pad="4"/>
+<connect gate="G$1" pin="5" pad="5"/>
+<connect gate="G$1" pin="6" pad="6"/>
+<connect gate="G$1" pin="7" pad="7"/>
+<connect gate="G$1" pin="8" pad="8"/>
+<connect gate="G$1" pin="9" pad="9"/>
+</connects>
 </device>
 </devices>
 </deviceset>
